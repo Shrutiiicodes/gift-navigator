@@ -1,0 +1,33 @@
+{
+  "_meta": {
+    "description": "Expert-validated scenarios for evaluating the free-text classifier. Each 'text' is a realistic business description; 'expected' is the entity id a domain expert would route it to. Expand this set as you validate more cases against IFSCA rules.",
+    "version": "1.0.0"
+  },
+  "cases": [
+    {"text": "We want to launch a venture capital fund investing in Indian startups", "expected": "aif"},
+    {"text": "Raising a private equity fund pooling money from institutional LPs", "expected": "aif"},
+    {"text": "We run a portfolio management and advisory business", "expected": "aif"},
+    {"text": "A hedge fund manager looking to set up an investment scheme", "expected": "aif"},
+    {"text": "Our existing bank wants a foreign-currency lending branch", "expected": "bank"},
+    {"text": "We do trade finance and treasury operations for global clients", "expected": "bank"},
+    {"text": "Looking to offer remittances and deposits in foreign currency", "expected": "bank"},
+    {"text": "We need a captive in-house centre doing analytics for our banking group", "expected": "gic"},
+    {"text": "Shared services and technology operations supporting only our own group", "expected": "gic"},
+    {"text": "Back office and middle office support for our financial services parent", "expected": "gic"},
+    {"text": "We lease aircraft to airlines and want to own the assets here", "expected": "lease"},
+    {"text": "Ship leasing and sale-and-leaseback of vessels", "expected": "lease"},
+    {"text": "Equipment leasing and asset-backed financing business", "expected": "lease"},
+    {"text": "We are a reinsurer wanting to write reinsurance in foreign currency", "expected": "insure"},
+    {"text": "Setting up a direct insurance underwriting operation", "expected": "insure"},
+    {"text": "Insurance intermediation and web aggregation insurtech", "expected": "insure"},
+    {"text": "Building a digital lending neobank app with a sandbox", "expected": "fintech"},
+    {"text": "We are a wealthtech robo-advisory startup seeking innovation support", "expected": "fintech"},
+    {"text": "A regtech platform that wants lower entry barriers to test our product", "expected": "fintech"},
+    {"text": "We want to broker and deal securities on the IFSC exchange", "expected": "broker"},
+    {"text": "Providing custody and clearing for securities trades", "expected": "broker"},
+    {"text": "Depository participant and capital markets intermediary services", "expected": "broker"},
+    {"text": "Trading stocks and securities as a broker-dealer", "expected": "broker"},
+    {"text": "Pooling investor capital to run an ESG investment fund", "expected": "aif"},
+    {"text": "Foreign currency credit and lending unit of our parent bank", "expected": "bank"}
+  ]
+}

@@ -1,0 +1,55 @@
+{
+  "_meta": {
+    "description": "Tax parameters for the GIFT IFSC saving estimator. All values INDICATIVE and must be verified against the latest Finance Act and IFSCA circulars.",
+    "schema_version": "1.0.0",
+    "last_reviewed": "2026-06-19"
+  },
+  "section_80la": {
+    "label": "Section 80LA deduction",
+    "deduction_pct": 100,
+    "holiday_years": 10,
+    "block_period_years": 25,
+    "post_holiday_rate_pct": 15,
+    "notes": "100% deduction on eligible income for any 10 consecutive years chosen within a block period. Budget 2026 indicated the block window can extend up to 25 years. A concessional rate (~15%) is referenced for income outside the holiday. VERIFY against the latest Finance Act.",
+    "source": "Income-tax Act, 1961 — Section 80LA; Finance Act (verify current year)",
+    "ref_url": "https://incometaxindia.gov.in",
+    "accessed": "2026-06-19"
+  },
+  "onshore_default_rate_pct": 25,
+  "onshore_rate_bounds_pct": {
+    "min": 9,
+    "max": 35
+  },
+  "comparison_hubs": [
+    {
+      "factor": "Headline tax on eligible income",
+      "gift": "0% (10-yr holiday), then ~15%",
+      "dubai": "9% (with relief band)",
+      "singapore": "17% (incentives can lower)"
+    },
+    {
+      "factor": "Regulator",
+      "gift": "IFSCA (unified)",
+      "dubai": "DFSA",
+      "singapore": "MAS"
+    },
+    {
+      "factor": "Operating currency",
+      "gift": "Freely convertible foreign currency",
+      "dubai": "Multi-currency",
+      "singapore": "Multi-currency"
+    },
+    {
+      "factor": "Hinterland access",
+      "gift": "India's domestic market",
+      "dubai": "MENA / Africa",
+      "singapore": "ASEAN"
+    },
+    {
+      "factor": "Maturity",
+      "gift": "Emerging (since 2020)",
+      "dubai": "Established",
+      "singapore": "Mature"
+    }
+  ]
+}

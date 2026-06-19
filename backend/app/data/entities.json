@@ -1,0 +1,308 @@
+{
+  "_meta": {
+    "description": "Single source of truth for GIFT IFSC entity structures. Every threshold carries a source so output is auditable. Figures are INDICATIVE and must be verified against current IFSCA circulars before any real use.",
+    "schema_version": "1.0.0",
+    "last_reviewed": "2026-06-19",
+    "disclaimer": "Not legal or tax advice. Verify against current IFSCA circulars and the latest Finance Act."
+  },
+  "entities": [
+    {
+      "id": "aif",
+      "name": "Alternative Investment Fund (via FME)",
+      "sub": "set up through a Fund Management Entity (FME)",
+      "regulator": "IFSCA",
+      "tag": "Asset Management",
+      "what": "Pool capital from investors and run an investment scheme out of GIFT IFSC, managed by an FME registered with IFSCA.",
+      "match_keywords": ["fund", "funds", "aif", "pe", "vc", "venture", "private equity", "invest", "investment", "portfolio", "asset management", "hedge", "advisory"],
+      "eligibility": [
+        {
+          "rule": "Register as a Fund Management Entity (FME) with IFSCA",
+          "source": "IFSCA (Fund Management) Regulations, 2022",
+          "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=3",
+          "accessed": "2026-06-19"
+        },
+        {
+          "rule": "Minimum net worth",
+          "value_nonretail_usd": 500000,
+          "value_retail_usd": 3000000,
+          "source": "IFSCA (Fund Management) Regulations, 2022 — net worth requirements by FME category",
+          "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=3",
+          "accessed": "2026-06-19"
+        },
+        {
+          "rule": "Two Key Managerial Personnel with relevant qualifications and track record",
+          "source": "IFSCA (Fund Management) Regulations, 2022",
+          "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=3",
+          "accessed": "2026-06-19"
+        },
+        {
+          "rule": "Minimum scheme corpus plus sponsor/manager skin-in-the-game contribution",
+          "source": "IFSCA (Fund Management) Regulations, 2022",
+          "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=3",
+          "accessed": "2026-06-19"
+        },
+        {
+          "rule": "FATF-compliant, fit-and-proper, no adverse regulatory history",
+          "source": "IFSCA fit-and-proper criteria",
+          "ref_url": "https://www.ifsca.gov.in",
+          "accessed": "2026-06-19"
+        }
+      ],
+      "timeline_weeks": [4, 8],
+      "timeline_note": "after FME registration",
+      "activities": ["Venture capital / PE funds", "Hedge & debt funds", "ESG funds", "Portfolio management & advisory"],
+      "tax_treatment_ref": "section_80la",
+      "branches": {
+        "investor_type": {
+          "question": "Who can invest in your fund?",
+          "sub": "This sets the minimum net worth your FME needs.",
+          "options": [
+            {"id": "nonretail", "label": "Accredited / institutional only", "detail": "Non-retail — net worth from USD 500k"},
+            {"id": "retail", "label": "Open to retail investors", "detail": "Retail — net worth USD 3M"}
+          ]
+        }
+      }
+    },
+    {
+      "id": "bank",
+      "name": "IFSC Banking Unit (IBU)",
+      "sub": "a foreign-currency banking branch",
+      "regulator": "IFSCA",
+      "tag": "Banking",
+      "what": "An existing bank opens a unit in GIFT IFSC to offer foreign-currency banking, lending and trade finance to global clients.",
+      "match_keywords": ["bank", "banking", "lending", "loan", "trade finance", "treasury", "deposit", "remittance", "ibu", "credit"],
+      "eligibility": [
+        {
+          "rule": "Parent bank must be licensed by RBI or a comparable foreign regulator",
+          "source": "IFSCA (Banking) Regulations, 2020",
+          "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=1",
+          "accessed": "2026-06-19"
+        },
+        {
+          "rule": "Minimum assigned capital commitment",
+          "value_usd": 20000000,
+          "source": "IFSCA Banking Handbook — minimum capital for an IBU",
+          "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=1",
+          "accessed": "2026-06-19"
+        },
+        {
+          "rule": "Board resolution and parent guarantee",
+          "source": "IFSCA (Banking) Regulations, 2020",
+          "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=1",
+          "accessed": "2026-06-19"
+        },
+        {
+          "rule": "FATF-compliant jurisdiction and robust AML controls",
+          "source": "IFSCA AML/CFT framework",
+          "ref_url": "https://www.ifsca.gov.in",
+          "accessed": "2026-06-19"
+        }
+      ],
+      "timeline_weeks": [12, 24],
+      "timeline_note": "approx 3-6 months",
+      "activities": ["Foreign-currency lending", "Trade finance & remittances", "Treasury & derivatives (incl. NDFs)", "Neo-banking services"],
+      "tax_treatment_ref": "section_80la",
+      "branches": {}
+    },
+    {
+      "id": "gic",
+      "name": "Global In-House Centre (GIC)",
+      "sub": "a captive support centre",
+      "regulator": "IFSCA",
+      "tag": "Captive Services",
+      "what": "A captive unit that provides support services exclusively to your own global financial-services group.",
+      "match_keywords": ["captive", "in-house", "gic", "support", "back office", "analytics", "technology", "ops", "operations", "research", "shared services"],
+      "eligibility": [
+        {
+          "rule": "Must belong to a financial-services group",
+          "source": "IFSCA (Global In-House Centres) Regulations, 2020",
+          "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=5",
+          "accessed": "2026-06-19"
+        },
+        {
+          "rule": "Set up as a company, LLP, branch or other permitted legal entity",
+          "source": "IFSCA (Global In-House Centres) Regulations, 2020",
+          "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=5",
+          "accessed": "2026-06-19"
+        },
+        {
+          "rule": "Deals in freely convertible foreign currency (INR allowed for administrative expenses)",
+          "source": "IFSCA (Global In-House Centres) Regulations, 2020",
+          "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=5",
+          "accessed": "2026-06-19"
+        },
+        {
+          "rule": "Services must support a financial service or product; no third-party clients (group-only)",
+          "source": "IFSCA (Global In-House Centres) Regulations, 2020",
+          "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=5",
+          "accessed": "2026-06-19"
+        }
+      ],
+      "timeline_weeks": [4, 8],
+      "timeline_note": "",
+      "activities": ["Risk & analytics", "Technology & operations", "Research & middle-office support", "Compliance support"],
+      "tax_treatment_ref": "section_80la",
+      "branches": {}
+    },
+    {
+      "id": "lease",
+      "name": "Aircraft / Ship Leasing Unit",
+      "sub": "a lessor / finance company",
+      "regulator": "IFSCA",
+      "tag": "Asset Leasing",
+      "what": "Own, lease and finance aircraft, ships or equipment out of GIFT IFSC — one of the city's fastest-growing niches.",
+      "match_keywords": ["lease", "leasing", "aircraft", "ship", "shipping", "vessel", "equipment", "lessor", "aviation", "rental", "asset finance"],
+      "eligibility": [
+        {
+          "rule": "Register as a lessor / Finance Company with IFSCA",
+          "source": "IFSCA (Finance Company) Regulations, 2021",
+          "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=4",
+          "accessed": "2026-06-19"
+        },
+        {
+          "rule": "Minimum owned funds (higher for fund-based activity)",
+          "source": "IFSCA (Finance Company) Regulations, 2021 — owned-fund thresholds",
+          "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=4",
+          "accessed": "2026-06-19"
+        },
+        {
+          "rule": "Defined permissible leasing activity (operating / financial lease)",
+          "source": "IFSCA framework for ship & aircraft leasing",
+          "ref_url": "https://www.ifsca.gov.in",
+          "accessed": "2026-06-19"
+        },
+        {
+          "rule": "FATF-compliant promoters and fit-and-proper criteria",
+          "source": "IFSCA fit-and-proper criteria",
+          "ref_url": "https://www.ifsca.gov.in",
+          "accessed": "2026-06-19"
+        }
+      ],
+      "timeline_weeks": [6, 10],
+      "timeline_note": "",
+      "activities": ["Operating & financial leasing", "Asset-backed financing", "Sale-and-leaseback", "Equipment leasing"],
+      "tax_treatment_ref": "section_80la",
+      "branches": {}
+    },
+    {
+      "id": "insure",
+      "name": "IFSC Insurance Office (IIO)",
+      "sub": "insurer / reinsurer / intermediary",
+      "regulator": "IFSCA",
+      "tag": "Insurance",
+      "what": "Carry on insurance, reinsurance or intermediary business in foreign currency from GIFT IFSC.",
+      "match_keywords": ["insurance", "insure", "reinsurance", "reinsurer", "insurer", "underwriting", "iio", "actuarial", "insurtech"],
+      "eligibility": [
+        {
+          "rule": "Be an insurer, reinsurer or intermediary (Indian or foreign)",
+          "source": "IFSCA (Registration of Insurance Business) Regulations, 2021",
+          "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=2",
+          "accessed": "2026-06-19"
+        },
+        {
+          "rule": "Satisfy IRDAI-aligned additional eligibility conditions",
+          "source": "IFSCA insurance framework (IRDAI-aligned)",
+          "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=2",
+          "accessed": "2026-06-19"
+        },
+        {
+          "rule": "Minimum assigned capital per IFSCA insurance regulations",
+          "source": "IFSCA (Registration of Insurance Business) Regulations, 2021",
+          "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=2",
+          "accessed": "2026-06-19"
+        },
+        {
+          "rule": "FATF-compliant promoters and fit-and-proper criteria",
+          "source": "IFSCA fit-and-proper criteria",
+          "ref_url": "https://www.ifsca.gov.in",
+          "accessed": "2026-06-19"
+        }
+      ],
+      "timeline_weeks": [12, 24],
+      "timeline_note": "approx 3-6 months",
+      "activities": ["Direct insurance", "Reinsurance", "Insurance intermediation", "InsurTech / web-aggregation"],
+      "tax_treatment_ref": "section_80la",
+      "branches": {}
+    },
+    {
+      "id": "fintech",
+      "name": "Fintech Entity",
+      "sub": "authorisation or regulatory sandbox",
+      "regulator": "IFSCA",
+      "tag": "Fintech",
+      "what": "Build and test financial-technology products under IFSCA's fintech framework — with a sandbox and incentive grants for innovators.",
+      "match_keywords": ["fintech", "sandbox", "startup", "app", "platform", "digital", "neobank", "regtech", "wealthtech", "robo", "innovation", "technology product"],
+      "eligibility": [
+        {
+          "rule": "Apply under the IFSCA Fintech framework (authorisation or sandbox)",
+          "source": "IFSCA (FinTech Entity) Framework, 2022",
+          "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=6",
+          "accessed": "2026-06-19"
+        },
+        {
+          "rule": "Demonstrate a genuine fintech innovation or use case",
+          "source": "IFSCA (FinTech Entity) Framework, 2022",
+          "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=6",
+          "accessed": "2026-06-19"
+        },
+        {
+          "rule": "Lower entry barriers vs full licences (sandbox route)",
+          "source": "IFSCA regulatory sandbox provisions",
+          "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=6",
+          "accessed": "2026-06-19"
+        },
+        {
+          "rule": "Eligible for incentive / grant support",
+          "source": "IFSCA FinTech Incentive Scheme",
+          "ref_url": "https://www.ifsca.gov.in",
+          "accessed": "2026-06-19"
+        }
+      ],
+      "timeline_weeks": [4, 8],
+      "timeline_note": "sandbox entry faster",
+      "activities": ["Digital lending & neo-banking", "WealthTech & robo-advisory", "RegTech", "Sustainable-finance tech"],
+      "tax_treatment_ref": "section_80la",
+      "branches": {}
+    },
+    {
+      "id": "broker",
+      "name": "Capital Markets Intermediary",
+      "sub": "broker-dealer / custodian",
+      "regulator": "IFSCA",
+      "tag": "Capital Markets",
+      "what": "Trade, broker or custody securities on GIFT IFSC's exchanges in foreign currency.",
+      "match_keywords": ["broker", "dealer", "broking", "trade securities", "custody", "custodian", "clearing", "depository", "exchange", "stock", "securities", "capital markets"],
+      "eligibility": [
+        {
+          "rule": "Register with IFSCA as a broker-dealer / intermediary",
+          "source": "IFSCA (Capital Market Intermediaries) Regulations, 2021",
+          "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=7",
+          "accessed": "2026-06-19"
+        },
+        {
+          "rule": "Meet prescribed net-worth thresholds",
+          "source": "IFSCA (Capital Market Intermediaries) Regulations, 2021",
+          "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=7",
+          "accessed": "2026-06-19"
+        },
+        {
+          "rule": "Membership of a recognised IFSC stock exchange",
+          "source": "IFSCA capital markets framework",
+          "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=7",
+          "accessed": "2026-06-19"
+        },
+        {
+          "rule": "Fit-and-proper criteria and AML compliance",
+          "source": "IFSCA fit-and-proper criteria",
+          "ref_url": "https://www.ifsca.gov.in",
+          "accessed": "2026-06-19"
+        }
+      ],
+      "timeline_weeks": [6, 10],
+      "timeline_note": "",
+      "activities": ["Broking & dealing", "Custody & clearing", "Depository participant services", "Listing support"],
+      "tax_treatment_ref": "section_80la",
+      "branches": {}
+    }
+  ]
+}
