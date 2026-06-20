@@ -48,22 +48,22 @@ def keyword_score(text: str) -> tuple[Optional[str], float, list[str]]:
 
 
 def _llm_classify(text: str) -> Optional[dict[str, Any]]:
-    """Optional LLM fallback. Returns None if no API key is configured.
+    """Optional LLM fallback via Groq. Returns None if no API key is configured.
 
     Kept import-local so the package works with zero extra dependencies when
     the LLM path is disabled.
     """
-    api_key = os.environ.get("ANTHROPIC_API_KEY")
+    api_key = os.environ.get("GROQ_API_KEY")
     if not api_key:
         return None
 
     try:
-        import anthropic  # type: ignore
+        from groq import Groq  # type: ignore
     except ImportError:
         return None
 
     ids = list(load_entities().keys())
-    client = anthropic.Anthropic(api_key=api_key)
+    client = Groq(api_key=api_key)
     prompt = (
         "You route a business description to ONE GIFT City IFSC entity type.\n"
         f"Valid ids: {', '.join(ids)}.\n"
@@ -71,17 +71,19 @@ def _llm_classify(text: str) -> Optional[dict[str, Any]]:
         f"Business: {text}"
     )
     try:
-        msg = client.messages.create(
-            model="claude-haiku-4-5-20251001",
-            max_tokens=10,
+        resp = client.chat.completions.create(
+            model="openai/gpt-oss-20b",
+            max_tokens=1024,            # reasoning models need room to think + answer
+            temperature=0,
+            reasoning_effort="low",     # minimize thinking for a simple routing task
             messages=[{"role": "user", "content": prompt}],
         )
-        guess = "".join(
-            b.text for b in msg.content if getattr(b, "type", "") == "text"
-        ).strip().lower()
-        if guess in ids:
+        out = (resp.choices[0].message.content or "").strip().lower()
+        guess = next((i for i in ids if i == out), None) \
+            or next((i for i in ids if i in out), None)
+        if guess:
             return {"entity_id": guess, "confidence": 0.75, "method": "llm"}
-    except Exception:
+    except Exception as e:
         return None
     return None
 
