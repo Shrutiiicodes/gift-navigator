@@ -6,7 +6,6 @@ import EntityCard from "./components/EntityCard.jsx";
 import TaxCalculator from "./components/TaxCalculator.jsx";
 import ComparisonTable from "./components/ComparisonTable.jsx";
 import AnalyticsPanel from "./components/AnalyticsPanel.jsx";
-const [showAnalytics, setShowAnalytics] = useState(false);
 
 function Feedback({ entityId }) {
   const [done, setDone] = useState(false);
