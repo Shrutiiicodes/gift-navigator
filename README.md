@@ -1,94 +1,138 @@
 # GIFT Setup Navigator
 
-A guided web tool that helps a founder, fund manager, or foreign firm answer three
-questions about setting up in India's GIFT City IFSC:
+Find the right way to set up in **GIFT City** — India's International Financial Services Centre (IFSC) — in under a minute. Answer a few questions and get a recommended entity structure, what you'd need to qualify, and an estimate of how much tax you'd save versus staying onshore.
 
-1. **Which entity structure fits me?** (recommendation engine over IFSCA rules)
-2. **What do I need to qualify?** (eligibility, capital thresholds, timeline, permitted activities — shown as a term-sheet card, with sources)
-3. **How much tax would I save?** (estimator over the Section 80LA tax-holiday period)
+**Live demo:** [gift-navigator.vercel.app](https://gift-navigator.vercel.app/)
+**API:** [gift-navigator-api.onrender.com](https://gift-navigator-api.onrender.com/)
 
-It turns expensive, fragmented advisory into a self-serve flow.
+> ⚠️ The backend runs on a free tier that sleeps when idle, so the **first request after a while may take 30–50 seconds** to wake up. Give it a moment on first load.
 
-## Architecture at a glance
+> ⚠️ Prototype for educational use. All figures are **indicative**, not legal or tax advice — verify against current [IFSCA](https://www.ifsca.gov.in) circulars and the latest Finance Act.
 
-```
-React + Vite (frontend)  ──HTTP/JSON──>  FastAPI (backend)
-                                          ├─ rules_engine   (answers -> entity)
-                                          ├─ tax_engine     (saving math)
-                                          ├─ classifier     (free-text -> entity; keyword + LLM fallback)
-                                          ├─ logging_store  (SQLite events + feedback)
-                                          └─ data/*.json    (cited source of truth)
-```
+---
 
-The regulation lives as **structured, cited data** (`backend/app/data/entities.json`,
-`tax_rules.json`), not hard-coded strings — so every figure is auditable and updating a
-threshold is a one-file edit. See `docs/architecture.md` and `docs/sources.md`.
+## What it does
 
-## Run it locally
+- **Guided wizard** — pick your structure and investor type, get a tailored recommendation with eligibility requirements and key benefits.
+- **Tax estimator** — compare onshore vs IFSC tax over a configurable block period.
+  - *Simple mode:* headline rate comparison with cumulative savings.
+  - *Advanced mode:* layers in surcharge, cess, and optional MAT (minimum alternate tax), with a year-by-year cumulative chart.
+- **Comparison table** — side-by-side view across the available structures and hubs.
+- **Free-text intake** — describe your situation in plain language and get classified to a structure (keyword matching with an optional LLM fallback).
+- **Usage analytics** — a built-in funnel (start → recommend → tax view → feedback) with step-over-step drop-off, plus a "most queried" breakdown.
+- **Feedback loop** — thumbs up/down on each recommendation, logged for review.
+
+---
+
+## Tech stack
+
+**Frontend** — React + Vite, [lucide-react](https://lucide.dev) icons, inline-SVG charts (no charting dependency).
+**Backend** — FastAPI + Pydantic, SQLite for event/feedback logging, pytest for tests.
+**Optional** — Anthropic SDK for the LLM free-text fallback (the app works fully without it via keyword matching).
+
+---
+
+## Running locally
+
+You'll need **Python 3.12** and **Node 18+**. Use two terminals.
 
 ### Backend
+
 ```bash
 cd backend
+python -m venv .venv
+# Windows:
+.venv\Scripts\activate
+# macOS/Linux:
+source .venv/bin/activate
+
 pip install -r requirements.txt
 uvicorn main:app --reload --port 8000
-# API now at http://localhost:8000  (docs at /docs)
 ```
 
+API comes up at `http://localhost:8000`. Interactive docs at `http://localhost:8000/docs`, health check at `/health`.
+
 ### Frontend
+
 ```bash
 cd frontend
 npm install
-cp .env.example .env          
+
+# point the frontend at your local API
+cp .env.example .env        # then ensure VITE_API_URL=http://localhost:8000
+
 npm run dev
 ```
 
-## Prove it works
+App runs at `http://localhost:5173`.
+
+### Tests & evaluation
 
 ```bash
 cd backend
-python -m pytest -q            # 22 unit tests across both engines
-python -m eval.run_eval        # classifier accuracy by path + difficulty, confusion matrix
+python -m pytest -q          # unit tests
+python -m eval.run_eval      # classifier accuracy against golden cases
 ```
 
-The eval prints overall accuracy plus a breakdown by **resolution path** (keyword vs
-fallback vs LLM) and by **case difficulty** (easy vs hard) over a 53-case expert-validated
-golden set, with a confusion matrix and the escalation rate. Reporting the keyword and
-escalation paths separately is what quantifies the value of the LLM fallback rather than
-assuming it.
+---
 
-## Features
+## API reference
 
-- **Guided wizard + free-text intake** — pick an activity, or describe the business in
-  plain English (keyword match with confidence-gated LLM fallback).
-- **Term-sheet result card** — eligibility, capital thresholds, timeline and activities,
-  each rule shown with its source.
-- **Tax estimator** — adjustable block period (10–25 years) with a year-by-year cumulative
-  savings chart, and an **advanced mode** that adds surcharge, cess and minimum alternate
-  tax to narrow the gap to a filing-grade estimate.
-- **Usage analytics** — a funnel view (`Usage` in the header) showing which structures are
-  most queried and where users abandon the flow.
+| Method | Endpoint | Purpose |
+|---|---|---|
+| `GET` | `/health` | Liveness check |
+| `GET` | `/entities` | Wizard step-1 options |
+| `POST` | `/recommend` | Recommend a structure for an entity + investor type |
+| `POST` | `/tax/estimate` | Tax comparison (simple or advanced mode) with cumulative series |
+| `GET` | `/tax/rules` | Tax parameters and comparison hubs |
+| `POST` | `/classify` | Classify free-text into a structure |
+| `POST` | `/feedback` | Log thumbs up/down on a recommendation |
+| `POST` | `/event` | Log a client-side funnel event |
+| `GET` | `/analytics` | Usage funnel + most-queried structures |
+| `GET` | `/stats` | Aggregate logging stats |
 
-## Deploy
+Full schemas are visible in the live Swagger UI at [`/docs`](https://gift-navigator-api.onrender.com/docs).
 
-- **Backend → Render** (free tier): new Web Service from this repo, root directory
-  `backend/`, build `pip install -r requirements.txt`, start
-  `uvicorn main:app --host 0.0.0.0 --port $PORT`. Set `FRONTEND_ORIGIN` to your frontend
-  URL, and `ANTHROPIC_API_KEY` only if you want the LLM free-text fallback.
-- **Frontend → Vercel / Netlify**: root directory `frontend/`, build `npm run build`,
-  output `dist`. Set `VITE_API_URL` to the Render URL.
+---
 
-Free-tier backends sleep after inactivity — hit `/health` once before a live demo.
+## Project structure
 
-## Optional: LLM free-text intake
+```
+gift-navigator/
+├── backend/
+│   ├── main.py                 # FastAPI app + routes
+│   ├── app/
+│   │   ├── rules_engine.py     # entity recommendation logic
+│   │   ├── tax_engine.py       # simple + advanced tax estimation
+│   │   ├── classifier.py       # free-text → structure (keyword + LLM fallback)
+│   │   ├── logging_store.py    # SQLite events, feedback, analytics
+│   │   ├── schemas.py          # Pydantic request/response models
+│   │   └── data/               # entities.json, tax_rules.json
+│   ├── eval/                   # golden cases + accuracy harness
+│   └── tests/                  # pytest suite
+├── frontend/
+│   └── src/
+│       ├── App.jsx
+│       ├── api/client.js
+│       ├── components/         # Wizard, TaxCalculator, CumulativeChart,
+│       │                       # AnalyticsPanel, ComparisonTable, EntityCard…
+│       └── styles/tokens.css
+└── docs/                       # architecture + sources notes
+```
 
-The free-text box ("describe your business in your own words") uses keyword matching
-first and only escalates to an LLM when keyword confidence is below a threshold
-(`classifier.CONFIDENCE_THRESHOLD`). With no `ANTHROPIC_API_KEY` set, it runs purely on
-keywords and falls back to a safe default. Uncomment `anthropic` in `requirements.txt`
-to enable the LLM path.
+---
 
-## Disclaimer
+## Deployment
 
-Figures are **indicative** and were coded for a prototype. Verify every threshold against
-the current IFSCA circulars and the latest Finance Act before any real use. This is not
-legal or tax advice.
+The live demo is split across two free hosts:
+
+- **Frontend → Vercel.** Root directory `frontend`, framework auto-detected as Vite. Set `VITE_API_URL` (no trailing slash) to the backend URL. Vite bakes env vars in at build time, so changing it requires a redeploy.
+- **Backend → Render.** Root directory `backend`, Python pinned to **3.12** (via `PYTHON_VERSION` or `backend/.python-version` — 3.14 lacks prebuilt `pydantic-core` wheels). Start command: `uvicorn main:app --host 0.0.0.0 --port $PORT`. Set `FRONTEND_ORIGIN` to your Vercel URL to lock down CORS (defaults to `*`).
+
+> The free Render disk is ephemeral, so SQLite analytics/feedback reset on restart — fine for a demo. For durable data, attach a persistent disk or swap to a hosted Postgres.
+
+---
+
+## License
+
+Educational prototype. Not affiliated with IFSCA or any government body. Figures are illustrative and must not be relied upon for actual structuring or tax decisions.
