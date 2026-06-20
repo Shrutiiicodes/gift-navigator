@@ -1,33 +1,273 @@
 {
   "_meta": {
-    "description": "Expert-validated scenarios for evaluating the free-text classifier. Each 'text' is a realistic business description; 'expected' is the entity id a domain expert would route it to. Expand this set as you validate more cases against IFSCA rules.",
-    "version": "1.0.0"
+    "description": "Expert-validated scenarios for evaluating the free-text classifier. 'text' is a realistic business description; 'expected' is the entity a domain reading of the rules assigns; 'difficulty' is 'easy' (keyword-obvious) or 'hard' (synonyms, indirect phrasing, or mixed signals that stress the matcher and exercise the fallback path).",
+    "version": "2.0.0"
   },
   "cases": [
-    {"text": "We want to launch a venture capital fund investing in Indian startups", "expected": "aif"},
-    {"text": "Raising a private equity fund pooling money from institutional LPs", "expected": "aif"},
-    {"text": "We run a portfolio management and advisory business", "expected": "aif"},
-    {"text": "A hedge fund manager looking to set up an investment scheme", "expected": "aif"},
-    {"text": "Our existing bank wants a foreign-currency lending branch", "expected": "bank"},
-    {"text": "We do trade finance and treasury operations for global clients", "expected": "bank"},
-    {"text": "Looking to offer remittances and deposits in foreign currency", "expected": "bank"},
-    {"text": "We need a captive in-house centre doing analytics for our banking group", "expected": "gic"},
-    {"text": "Shared services and technology operations supporting only our own group", "expected": "gic"},
-    {"text": "Back office and middle office support for our financial services parent", "expected": "gic"},
-    {"text": "We lease aircraft to airlines and want to own the assets here", "expected": "lease"},
-    {"text": "Ship leasing and sale-and-leaseback of vessels", "expected": "lease"},
-    {"text": "Equipment leasing and asset-backed financing business", "expected": "lease"},
-    {"text": "We are a reinsurer wanting to write reinsurance in foreign currency", "expected": "insure"},
-    {"text": "Setting up a direct insurance underwriting operation", "expected": "insure"},
-    {"text": "Insurance intermediation and web aggregation insurtech", "expected": "insure"},
-    {"text": "Building a digital lending neobank app with a sandbox", "expected": "fintech"},
-    {"text": "We are a wealthtech robo-advisory startup seeking innovation support", "expected": "fintech"},
-    {"text": "A regtech platform that wants lower entry barriers to test our product", "expected": "fintech"},
-    {"text": "We want to broker and deal securities on the IFSC exchange", "expected": "broker"},
-    {"text": "Providing custody and clearing for securities trades", "expected": "broker"},
-    {"text": "Depository participant and capital markets intermediary services", "expected": "broker"},
-    {"text": "Trading stocks and securities as a broker-dealer", "expected": "broker"},
-    {"text": "Pooling investor capital to run an ESG investment fund", "expected": "aif"},
-    {"text": "Foreign currency credit and lending unit of our parent bank", "expected": "bank"}
+    {
+      "text": "We want to launch a venture capital fund investing in Indian startups",
+      "expected": "aif",
+      "difficulty": "easy"
+    },
+    {
+      "text": "Raising a private equity fund pooling money from institutional LPs",
+      "expected": "aif",
+      "difficulty": "easy"
+    },
+    {
+      "text": "We run a portfolio management and advisory business",
+      "expected": "aif",
+      "difficulty": "easy"
+    },
+    {
+      "text": "A hedge fund manager looking to set up an investment scheme",
+      "expected": "aif",
+      "difficulty": "easy"
+    },
+    {
+      "text": "Pooling investor capital to run an ESG investment fund",
+      "expected": "aif",
+      "difficulty": "easy"
+    },
+    {
+      "text": "We gather money from wealthy backers and deploy it into growth companies",
+      "expected": "aif",
+      "difficulty": "hard"
+    },
+    {
+      "text": "Setting up a vehicle to collect commitments and invest on behalf of others",
+      "expected": "aif",
+      "difficulty": "hard"
+    },
+    {
+      "text": "Our existing bank wants a foreign-currency lending branch",
+      "expected": "bank",
+      "difficulty": "easy"
+    },
+    {
+      "text": "We do trade finance and treasury operations for global clients",
+      "expected": "bank",
+      "difficulty": "easy"
+    },
+    {
+      "text": "Looking to offer remittances and deposits in foreign currency",
+      "expected": "bank",
+      "difficulty": "easy"
+    },
+    {
+      "text": "Foreign currency credit and lending unit of our parent bank",
+      "expected": "bank",
+      "difficulty": "easy"
+    },
+    {
+      "text": "We extend dollar-denominated loans and handle cross-border payments for corporates",
+      "expected": "bank",
+      "difficulty": "hard"
+    },
+    {
+      "text": "Our licensed deposit-taking institution wants an offshore branch here",
+      "expected": "bank",
+      "difficulty": "hard"
+    },
+    {
+      "text": "We need a captive in-house centre doing analytics for our banking group",
+      "expected": "gic",
+      "difficulty": "easy"
+    },
+    {
+      "text": "Shared services and technology operations supporting only our own group",
+      "expected": "gic",
+      "difficulty": "easy"
+    },
+    {
+      "text": "Back office and middle office support for our financial services parent",
+      "expected": "gic",
+      "difficulty": "easy"
+    },
+    {
+      "text": "A unit that only serves our own group with risk modelling and reporting, no outside clients",
+      "expected": "gic",
+      "difficulty": "hard"
+    },
+    {
+      "text": "Internal delivery centre handling operations exclusively for our insurance parent worldwide",
+      "expected": "gic",
+      "difficulty": "hard"
+    },
+    {
+      "text": "We lease aircraft to airlines and want to own the assets here",
+      "expected": "lease",
+      "difficulty": "easy"
+    },
+    {
+      "text": "Ship leasing and sale-and-leaseback of vessels",
+      "expected": "lease",
+      "difficulty": "easy"
+    },
+    {
+      "text": "Equipment leasing and asset-backed financing business",
+      "expected": "lease",
+      "difficulty": "easy"
+    },
+    {
+      "text": "We buy planes and rent them out to carriers on long-term agreements",
+      "expected": "lease",
+      "difficulty": "hard"
+    },
+    {
+      "text": "Owning vessels and hiring them to shipping operators for a fee",
+      "expected": "lease",
+      "difficulty": "hard"
+    },
+    {
+      "text": "We are a reinsurer wanting to write reinsurance in foreign currency",
+      "expected": "insure",
+      "difficulty": "easy"
+    },
+    {
+      "text": "Setting up a direct insurance underwriting operation",
+      "expected": "insure",
+      "difficulty": "easy"
+    },
+    {
+      "text": "Insurance intermediation and web aggregation insurtech",
+      "expected": "insure",
+      "difficulty": "easy"
+    },
+    {
+      "text": "We cover risks for clients in exchange for premiums and reinsure large exposures",
+      "expected": "insure",
+      "difficulty": "hard"
+    },
+    {
+      "text": "A company that underwrites policies and pays claims to policyholders",
+      "expected": "insure",
+      "difficulty": "hard"
+    },
+    {
+      "text": "Building a digital lending neobank app with a sandbox",
+      "expected": "fintech",
+      "difficulty": "easy"
+    },
+    {
+      "text": "We are a wealthtech robo-advisory startup seeking innovation support",
+      "expected": "fintech",
+      "difficulty": "easy"
+    },
+    {
+      "text": "A regtech platform that wants lower entry barriers to test our product",
+      "expected": "fintech",
+      "difficulty": "easy"
+    },
+    {
+      "text": "Early-stage company building a payments technology product, want to pilot before a full licence",
+      "expected": "fintech",
+      "difficulty": "hard"
+    },
+    {
+      "text": "We have an experimental financial app and want a controlled environment to trial it",
+      "expected": "fintech",
+      "difficulty": "hard"
+    },
+    {
+      "text": "We want to broker and deal securities on the IFSC exchange",
+      "expected": "broker",
+      "difficulty": "easy"
+    },
+    {
+      "text": "Providing custody and clearing for securities trades",
+      "expected": "broker",
+      "difficulty": "easy"
+    },
+    {
+      "text": "Depository participant and capital markets intermediary services",
+      "expected": "broker",
+      "difficulty": "easy"
+    },
+    {
+      "text": "Trading stocks and securities as a broker-dealer",
+      "expected": "broker",
+      "difficulty": "easy"
+    },
+    {
+      "text": "We execute buy and sell orders for clients on the bourse and safekeep their holdings",
+      "expected": "broker",
+      "difficulty": "hard"
+    },
+    {
+      "text": "An intermediary that routes client orders to the exchange and settles trades",
+      "expected": "broker",
+      "difficulty": "hard"
+    },
+    {
+      "text": "We manage a debt fund lending to mid-market firms",
+      "expected": "aif",
+      "difficulty": "hard"
+    },
+    {
+      "text": "Our group bank seeks to do interest-rate and currency derivatives offshore",
+      "expected": "bank",
+      "difficulty": "hard"
+    },
+    {
+      "text": "We provide compliance and audit support only to entities within our own holding company",
+      "expected": "gic",
+      "difficulty": "hard"
+    },
+    {
+      "text": "Aviation finance house acquiring jets to dry-lease to operators",
+      "expected": "lease",
+      "difficulty": "hard"
+    },
+    {
+      "text": "We accept ceded risk from primary insurers across markets",
+      "expected": "insure",
+      "difficulty": "hard"
+    },
+    {
+      "text": "A sustainable-finance technology venture entering the regulatory sandbox",
+      "expected": "fintech",
+      "difficulty": "hard"
+    },
+    {
+      "text": "We offer clearing membership and act as a custodian for foreign portfolio investors",
+      "expected": "broker",
+      "difficulty": "hard"
+    },
+    {
+      "text": "We want to set up a fund of funds investing in other PE vehicles",
+      "expected": "aif",
+      "difficulty": "hard"
+    },
+    {
+      "text": "Banking unit focused on syndicated foreign-currency loans",
+      "expected": "bank",
+      "difficulty": "easy"
+    },
+    {
+      "text": "Captive technology and data-science hub for our asset-management group only",
+      "expected": "gic",
+      "difficulty": "hard"
+    },
+    {
+      "text": "Container ship owner leasing tonnage to liner companies",
+      "expected": "lease",
+      "difficulty": "hard"
+    },
+    {
+      "text": "Life and health insurer setting up a foreign-currency office",
+      "expected": "insure",
+      "difficulty": "easy"
+    },
+    {
+      "text": "Neobanking platform for migrant remittances built as a fintech",
+      "expected": "fintech",
+      "difficulty": "hard"
+    },
+    {
+      "text": "Securities dealer offering depository participant services",
+      "expected": "broker",
+      "difficulty": "easy"
+    }
   ]
 }

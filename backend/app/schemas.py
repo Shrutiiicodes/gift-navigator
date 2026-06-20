@@ -37,7 +37,19 @@ class RecommendResponse(BaseModel):
 class TaxRequest(BaseModel):
     annual_income_usd: float = Field(..., ge=0)
     onshore_rate_pct: float = Field(..., ge=0, le=100)
+    block_period_years: Optional[int] = Field(None, ge=1, le=40)
+    advanced: bool = False
+    surcharge_pct: Optional[float] = Field(None, ge=0, le=100)
+    cess_pct: Optional[float] = Field(None, ge=0, le=100)
+    mat_rate_pct: Optional[float] = Field(None, ge=0, le=100)
+    apply_mat: bool = False
 
+class TaxSeriesPoint(BaseModel):
+    year: int
+    phase: str
+    onshore_cumulative: float
+    ifsc_cumulative: float
+    saving_cumulative: float
 
 class TaxResponse(BaseModel):
     annual_income_usd: float
@@ -51,6 +63,13 @@ class TaxResponse(BaseModel):
     post_holiday_rate_pct: float
     block_total_saving: float
     disclaimer: str
+    ifsc_post_holiday_annual: float
+    advanced: bool
+    surcharge_pct: float
+    cess_pct: float
+    mat_rate_pct: float
+    apply_mat: bool
+    series: list[TaxSeriesPoint]
 
 
 # ---- /classify (free-text intake) ----
@@ -76,3 +95,12 @@ class FeedbackRequest(BaseModel):
 class FeedbackResponse(BaseModel):
     ok: bool
     feedback_id: int
+
+# ---- /event (client-side funnel logging) ----
+class EventRequest(BaseModel):
+    kind: str = Field(..., max_length=40)
+    entity_id: Optional[str] = None
+
+
+class EventResponse(BaseModel):
+    ok: bool

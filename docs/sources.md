@@ -34,6 +34,9 @@ current circular / Act and replace the "Status" with the version and date you co
 | Holiday length | 10 consecutive years | Section 80LA | ☐ confirm |
 | Block period | 25 years | Budget 2026 (claimed) | ⚠ **must verify against the enacted Finance Act** |
 | Post-holiday rate | ~15% | Concessional regime (verify) | ☐ confirm |
+| Surcharge | 12% (advanced mode) | Finance Act surcharge schedule | ☐ confirm current band |
+| Cess | 4% (advanced mode) | Health & education cess | ☐ confirm |
+| MAT rate | 9% (advanced mode) | s.115JB MAT for IFSC units | ☐ confirm current rate |
 
 ## Stated model limitations
 

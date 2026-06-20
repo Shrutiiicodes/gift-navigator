@@ -47,13 +47,27 @@ npm run dev
 
 ```bash
 cd backend
-python -m pytest -q            # unit tests on both engines
-python -m eval.run_eval        # classifier accuracy + confusion matrix on the golden set
+python -m pytest -q            # 22 unit tests across both engines
+python -m eval.run_eval        # classifier accuracy by path + difficulty, confusion matrix
 ```
 
-The eval prints an accuracy figure and a confusion matrix over expert-validated
-scenarios — this is the artefact that answers "how do you know the recommendations are
-right?" in a dissertation or interview.
+The eval prints overall accuracy plus a breakdown by **resolution path** (keyword vs
+fallback vs LLM) and by **case difficulty** (easy vs hard) over a 53-case expert-validated
+golden set, with a confusion matrix and the escalation rate. Reporting the keyword and
+escalation paths separately is what quantifies the value of the LLM fallback rather than
+assuming it.
+
+## Features
+
+- **Guided wizard + free-text intake** — pick an activity, or describe the business in
+  plain English (keyword match with confidence-gated LLM fallback).
+- **Term-sheet result card** — eligibility, capital thresholds, timeline and activities,
+  each rule shown with its source.
+- **Tax estimator** — adjustable block period (10–25 years) with a year-by-year cumulative
+  savings chart, and an **advanced mode** that adds surcharge, cess and minimum alternate
+  tax to narrow the gap to a filing-grade estimate.
+- **Usage analytics** — a funnel view (`Usage` in the header) showing which structures are
+  most queried and where users abandon the flow.
 
 ## Deploy
 

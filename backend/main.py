@@ -13,6 +13,8 @@ from app import classifier, logging_store, rules_engine, tax_engine
 from app.schemas import (
     ClassifyRequest,
     ClassifyResponse,
+    EventRequest,
+    EventResponse,
     FeedbackRequest,
     FeedbackResponse,
     RecommendRequest,
@@ -66,10 +68,32 @@ def recommend(req: RecommendRequest) -> RecommendResponse:
 @app.post("/tax/estimate", response_model=TaxResponse)
 def tax_estimate(req: TaxRequest) -> TaxResponse:
     try:
-        result = tax_engine.estimate(req.annual_income_usd, req.onshore_rate_pct)
+        result = tax_engine.estimate(
+            req.annual_income_usd,
+            req.onshore_rate_pct,
+            block_period_years=req.block_period_years,
+            advanced=req.advanced,
+            surcharge_pct=req.surcharge_pct,
+            cess_pct=req.cess_pct,
+            mat_rate_pct=req.mat_rate_pct,
+            apply_mat=req.apply_mat,
+        )
     except ValueError as exc:
         raise HTTPException(status_code=400, detail=str(exc))
     return TaxResponse(**result)
+
+
+@app.post("/event", response_model=EventResponse)
+def event(req: EventRequest) -> EventResponse:
+    """Client-side funnel events (e.g. 'start', 'tax_view')."""
+    logging_store.log_event(req.kind, req.entity_id)
+    return EventResponse(ok=True)
+
+
+@app.get("/analytics")
+def analytics() -> dict:
+    """Most-queried structures and the usage funnel with drop-off."""
+    return logging_store.analytics()
 
 
 @app.get("/tax/rules")

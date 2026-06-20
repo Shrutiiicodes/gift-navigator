@@ -64,18 +64,45 @@ schemas, and a `/stats` endpoint that aggregates the logs.
 | GET    | `/health`        | Liveness check                           |
 | GET    | `/entities`      | Wizard step-1 options                    |
 | POST   | `/recommend`     | Resolve a chosen entity                  |
-| POST   | `/tax/estimate`  | Tax-saving estimate                      |
+| POST   | `/tax/estimate`  | Tax-saving estimate (simple or advanced) |
 | GET    | `/tax/rules`     | Tax parameters + hub comparison          |
 | POST   | `/classify`      | Free-text → entity                       |
 | POST   | `/feedback`      | Log a thumbs up/down                     |
+| POST   | `/event`         | Log a client-side funnel event           |
+| GET    | `/analytics`     | Most-queried structures + funnel drop-off|
 | GET    | `/stats`         | Aggregated usage + feedback              |
+
+## Tax model: simple vs advanced
+
+`tax_engine.estimate` runs in two modes. In **simple** mode it applies the full Section
+80LA deduction during the holiday (IFSC tax = 0) and a concessional rate on the remainder
+of the block. In **advanced** mode it layers surcharge and cess onto every tax figure
+(surcharge on tax, cess on tax+surcharge) and optionally applies minimum alternate tax
+(MAT) as a floor during the holiday and afterwards. The block period is an adjustable
+input (bounded 10–25 years), and the engine returns a year-by-year cumulative series that
+drives the savings chart on the frontend. Simple mode zeroes all advanced knobs, so it
+reduces exactly to the original first-order model and the original tests still hold.
+
+## Usage analytics
+
+Client-side funnel stages (`start`, `tax_view`) are logged through `/event`; `recommend`
+and `feedback` are logged server-side from their own routes, so nothing is double-counted.
+`/analytics` aggregates the event log into the most-queried structures and a funnel with
+step-over-step drop-off, surfacing both demand (which structures) and friction (where
+users abandon).
 
 ## Evaluation strategy
 
-1. **Unit tests** — deterministic correctness of both engines, including edge cases.
-2. **Golden-set validation** — `eval/golden_cases.json` + `eval/run_eval.py` produce an
-   accuracy figure and confusion matrix over expert-validated scenarios.
+1. **Unit tests** — deterministic correctness of both engines, including edge cases and
+   the advanced tax mode (surcharge/cess compounding, MAT floor, adjustable-block bounds,
+   cumulative-series monotonicity). 22 tests.
+2. **Golden-set validation** — `eval/golden_cases.json` (53 cases, tagged easy/hard) +
+   `eval/run_eval.py` produce overall accuracy, accuracy broken down by **resolution path**
+   (keyword vs fallback vs LLM) and by **difficulty**, plus a confusion matrix and the
+   escalation rate. The keyword path and the escalation path are measured separately so
+   the value of the LLM fallback is quantified rather than assumed.
 3. **Source traceability** — every output figure traces to `docs/sources.md`.
-4. **Usability testing** — task-based sessions with 5–8 participants; responses logged
-   via `/feedback`. Standard SUS + task completion + time-on-task.
-5. **Tax-model validation** — hand-calculated cases checked against engine output.
+4. **Usability testing** — task-based sessions; responses logged via `/feedback`, and the
+   `/analytics` funnel gives a quantitative companion to the qualitative findings.
+5. **Tax-model validation** — hand-calculated cases checked against engine output, now
+   covering the advanced mode as well.

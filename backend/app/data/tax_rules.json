@@ -20,6 +20,19 @@
     "min": 9,
     "max": 35
   },
+  "block_period_bounds_years": {
+    "min": 10,
+    "max": 25
+  },
+  "advanced_defaults": {
+    "surcharge_pct": 12,
+    "cess_pct": 4,
+    "mat_rate_pct": 9,
+    "_note": "Surcharge applies on tax; cess applies on tax+surcharge. MAT (minimum alternate tax) on book profits can apply during the holiday even with the 100% deduction, so 'apply_mat' lifts IFSC holiday tax from zero to the MAT charge. All values INDICATIVE — verify against the latest Finance Act.",
+    "source": "Income-tax Act, 1961 — MAT (s.115JB) and surcharge/cess schedules; verify current rates",
+    "ref_url": "https://incometaxindia.gov.in",
+    "accessed": "2026-06-19"
+  },
   "comparison_hubs": [
     {
       "factor": "Headline tax on eligible income",

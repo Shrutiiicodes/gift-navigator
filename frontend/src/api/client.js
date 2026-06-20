@@ -26,10 +26,10 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ entity_id, investor_type }),
     }),
-  taxEstimate: (annual_income_usd, onshore_rate_pct) =>
+  taxEstimate: (params) =>
     call("/tax/estimate", {
       method: "POST",
-      body: JSON.stringify({ annual_income_usd, onshore_rate_pct }),
+      body: JSON.stringify(params),
     }),
   taxRules: () => call("/tax/rules"),
   classify: (text) =>
@@ -39,4 +39,10 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ entity_id, helpful, comment }),
     }),
+  event: (kind, entity_id = null) =>
+    call("/event", {
+      method: "POST",
+      body: JSON.stringify({ kind, entity_id }),
+    }).catch(() => { }), // fire-and-forget; never block the UI
+  analytics: () => call("/analytics"),
 };

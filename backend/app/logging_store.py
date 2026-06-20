@@ -93,3 +93,55 @@ def stats() -> dict[str, Any]:
         "feedback_helpful": fb["helpful"] or 0,
         "feedback_total": fb["total"] or 0,
     }
+
+
+# The funnel stages, in order. Each maps to an event 'kind'.
+FUNNEL_STAGES = ["start", "recommend", "tax_view", "feedback"]
+_STAGE_LABELS = {
+    "start": "Started navigator",
+    "recommend": "Got a recommendation",
+    "tax_view": "Opened tax estimate",
+    "feedback": "Left feedback",
+}
+
+
+def analytics() -> dict[str, Any]:
+    """Most-queried structures plus a funnel with step-over-step drop-off."""
+    with _conn() as conn:
+        counts = {
+            row["kind"]: row["c"]
+            for row in conn.execute(
+                "SELECT kind, COUNT(*) c FROM events GROUP BY kind"
+            ).fetchall()
+        }
+        fb_total = conn.execute("SELECT COUNT(*) c FROM feedback").fetchone()["c"]
+        by_entity = conn.execute(
+            "SELECT entity_id, COUNT(*) c FROM events WHERE kind='recommend' "
+            "AND entity_id IS NOT NULL GROUP BY entity_id ORDER BY c DESC"
+        ).fetchall()
+
+    counts["feedback"] = fb_total  # feedback lives in its own table
+
+    funnel = []
+    prev = None
+    for stage in FUNNEL_STAGES:
+        n = counts.get(stage, 0)
+        drop = None
+        if prev is not None and prev > 0:
+            drop = round((1 - n / prev) * 100, 1)
+        funnel.append(
+            {
+                "stage": stage,
+                "label": _STAGE_LABELS[stage],
+                "count": n,
+                "drop_from_prev_pct": drop,
+            }
+        )
+        prev = n if n > 0 else prev
+
+    return {
+        "most_queried": [
+            {"entity_id": r["entity_id"], "count": r["c"]} for r in by_entity
+        ],
+        "funnel": funnel,
+    }

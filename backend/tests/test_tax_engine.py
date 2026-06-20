@@ -51,3 +51,57 @@ def test_rate_out_of_bounds_rejected():
 def test_disclaimer_present():
     out = tax_engine.estimate(1_000_000, 25)
     assert "Not legal or tax advice" in out["disclaimer"]
+
+
+# ---- Extension tests: adjustable block, cumulative series, advanced mode ----
+
+def test_series_length_matches_block():
+    out = tax_engine.estimate(1_000_000, 25, block_period_years=18)
+    assert out["block_period_years"] == 18
+    assert len(out["series"]) == 18
+    assert out["series"][-1]["year"] == 18
+
+
+def test_series_is_cumulative_and_monotonic():
+    out = tax_engine.estimate(1_000_000, 25)
+    savings = [p["saving_cumulative"] for p in out["series"]]
+    assert savings == sorted(savings)  # never decreases
+    assert out["series"][-1]["saving_cumulative"] == out["block_total_saving"]
+
+
+def test_series_phase_switches_after_holiday():
+    out = tax_engine.estimate(1_000_000, 25)
+    assert out["series"][9]["phase"] == "holiday"        # year 10
+    assert out["series"][10]["phase"] == "concessional"  # year 11
+
+
+def test_block_period_out_of_bounds_rejected():
+    with pytest.raises(ValueError):
+        tax_engine.estimate(1_000_000, 25, block_period_years=40)
+
+
+def test_advanced_surcharge_cess_increases_onshore_tax():
+    simple = tax_engine.estimate(1_000_000, 30)
+    adv = tax_engine.estimate(1_000_000, 30, advanced=True)
+    # surcharge + cess lift the onshore tax above the plain figure
+    assert adv["onshore_tax_annual"] > simple["onshore_tax_annual"]
+    # 300k * 1.12 * 1.04 = 349,440
+    assert adv["onshore_tax_annual"] == 349_440
+
+
+def test_mat_floor_lifts_holiday_tax_off_zero():
+    no_mat = tax_engine.estimate(1_000_000, 30, advanced=True, apply_mat=False)
+    with_mat = tax_engine.estimate(1_000_000, 30, advanced=True, apply_mat=True)
+    assert no_mat["ifsc_tax_annual"] == 0
+    assert with_mat["ifsc_tax_annual"] > 0
+    # 9% MAT * 1.12 * 1.04 = 104,832
+    assert with_mat["ifsc_tax_annual"] == 104_832
+
+
+def test_simple_mode_ignores_advanced_knobs():
+    # advanced=False must zero out surcharge/cess/MAT regardless of passed values
+    out = tax_engine.estimate(
+        1_000_000, 30, surcharge_pct=99, cess_pct=99, mat_rate_pct=99, apply_mat=True
+    )
+    assert out["surcharge_pct"] == 0
+    assert out["ifsc_tax_annual"] == 0
