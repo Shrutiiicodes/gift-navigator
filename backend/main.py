@@ -1,7 +1,3 @@
-"""GIFT Setup Navigator API.
-
-Run locally:  uvicorn main:app --reload --port 8000
-"""
 from __future__ import annotations
 
 import os

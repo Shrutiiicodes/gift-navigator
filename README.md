@@ -38,9 +38,8 @@ uvicorn main:app --reload --port 8000
 ```bash
 cd frontend
 npm install
-cp .env.example .env          # VITE_API_URL=http://localhost:8000
+cp .env.example .env          
 npm run dev
-# App now at http://localhost:5173
 ```
 
 ## Prove it works
