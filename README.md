@@ -18,7 +18,7 @@ Find the right way to set up in **GIFT City** — India's International Financia
   - *Simple mode:* headline rate comparison with cumulative savings.
   - *Advanced mode:* layers in surcharge, cess, and optional MAT (minimum alternate tax), with a year-by-year cumulative chart.
 - **Comparison table** — side-by-side view across the available structures and hubs.
-- **Free-text intake** — describe your situation in plain language and get classified to a structure (keyword matching with an optional LLM fallback).
+- **Free-text intake** — describe your situation in plain language and get classified to a structure. A hybrid classifier scores keywords first (fast, free, deterministic) and only escalates to a Groq-hosted LLM when keyword confidence is low.
 - **Usage analytics** — a built-in funnel (start → recommend → tax view → feedback) with step-over-step drop-off, plus a "most queried" breakdown.
 - **Feedback loop** — thumbs up/down on each recommendation, logged for review.
 
@@ -28,8 +28,7 @@ Find the right way to set up in **GIFT City** — India's International Financia
 
 **Frontend** — React + Vite, [lucide-react](https://lucide.dev) icons, inline-SVG charts (no charting dependency).
 **Backend** — FastAPI + Pydantic, SQLite for event/feedback logging, pytest for tests.
-**Optional** — Anthropic SDK for the LLM free-text fallback (the app works fully without it via keyword matching).
-
+**LLM fallback** — [Groq](https://groq.com) (`openai/gpt-oss-20b`) for free-text classification when keyword confidence is low. The app works fully without it via keyword matching.
 ---
 
 ## Running locally
@@ -127,7 +126,7 @@ gift-navigator/
 The live demo is split across two free hosts:
 
 - **Frontend → Vercel.** Root directory `frontend`, framework auto-detected as Vite. Set `VITE_API_URL` (no trailing slash) to the backend URL. Vite bakes env vars in at build time, so changing it requires a redeploy.
-- **Backend → Render.** Root directory `backend`, Python pinned to **3.12** (via `PYTHON_VERSION` or `backend/.python-version` — 3.14 lacks prebuilt `pydantic-core` wheels). Start command: `uvicorn main:app --host 0.0.0.0 --port $PORT`. Set `FRONTEND_ORIGIN` to your Vercel URL to lock down CORS (defaults to `*`).
+- **Backend → Render.** Root directory `backend`, Python pinned to **3.12** (via `PYTHON_VERSION` or `backend/.python-version` — 3.14 lacks prebuilt `pydantic-core` wheels). Start command: `uvicorn main:app --host 0.0.0.0 --port $PORT`. Set `FRONTEND_ORIGIN` to your Vercel URL to lock down CORS (defaults to `*`). Set `GROQ_API_KEY` to enable the LLM free-text fallback (falls back to keyword-only if unset).
 
 > The free Render disk is ephemeral, so SQLite analytics/feedback reset on restart — fine for a demo. For durable data, attach a persistent disk or swap to a hosted Postgres.
 
