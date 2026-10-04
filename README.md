@@ -26,7 +26,7 @@ Find the right way to set up in **GIFT City** — India's International Financia
 
 ## Tech stack
 
-**Frontend** — React + Vite, [lucide-react](https://lucide.dev) icons, inline-SVG charts (no charting dependency).
+**Frontend** — React + Vite, plain CSS, inline-SVG charts (no UI or charting dependency).
 **Backend** — FastAPI + Pydantic, SQLite for event/feedback logging, pytest for tests.
 **LLM fallback** — [Groq](https://groq.com) (`openai/gpt-oss-20b`) for free-text classification when keyword confidence is low. The app works fully without it via keyword matching.
 ---

@@ -12,22 +12,27 @@ export default function AnalyticsPanel() {
             .catch((e) => setErr(e.message));
     }, []);
 
-    if (err) return <div className="error-msg">Couldn't load analytics: {err}</div>;
-    if (!data) return <p className="state-msg">Loading usage…</p>;
+    if (err) return <div className="error-msg">The usage data didn't load: {err}</div>;
+    if (!data) return <p className="state-msg">Loading usage data…</p>;
 
     const maxQ = Math.max(1, ...data.most_queried.map((m) => m.count));
     const maxF = Math.max(1, ...data.funnel.map((f) => f.count));
 
     return (
         <div className="analytics">
-            <h3>Most-queried structures</h3>
+            <h2>How the navigator is being used</h2>
+            <p className="state-msg">
+                Visits are counted once per browser tab and carry no personal data.
+            </p>
+
+            <h3>Structures recommended most often</h3>
             {data.most_queried.length === 0 ? (
                 <p className="state-msg">No recommendations logged yet.</p>
             ) : (
                 <div className="abars">
                     {data.most_queried.map((m) => (
                         <div className="abar-row" key={m.entity_id}>
-                            <div className="abar-label" title={m.name}>{m.name}</div>
+                            <div className="abar-label">{m.name}</div>
                             <div className="abar-track">
                                 <div className="abar-fill"
                                     style={{ width: `${(m.count / maxQ) * 100}%` }}>
@@ -39,7 +44,7 @@ export default function AnalyticsPanel() {
                 </div>
             )}
 
-            <h3 className="gap-top">Where users drop off</h3>
+            <h3>How far visits get</h3>
             <div className="funnel">
                 {data.funnel.map((f) => (
                     <div className="funnel-row" key={f.stage}>
@@ -52,7 +57,7 @@ export default function AnalyticsPanel() {
                         </div>
                         <div className="funnel-drop">
                             {f.drop_from_prev_pct === null
-                                ? "—"
+                                ? ""
                                 : f.drop_from_prev_pct === 0
                                 ? "0%"
                                 : `−${f.drop_from_prev_pct}%`}
@@ -61,9 +66,9 @@ export default function AnalyticsPanel() {
                 ))}
             </div>
             <p className="state-msg gap-top">
-                Counts are visits (one per browser tab), so repeat clicks don't inflate a step.
-                Drop-off is the share lost from the previous step. Feedback so far:{" "}
-                {data.feedback.helpful} of {data.feedback.total} found the recommendation useful.
+                The percentage is the share of visits lost since the previous step.
+                {data.feedback.total > 0 &&
+                    ` ${data.feedback.helpful} of ${data.feedback.total} feedback responses said the recommendation was useful.`}
             </p>
         </div>
     );

@@ -101,21 +101,11 @@ def wizard_options() -> list[dict[str, Any]]:
     `branch` is the entity's follow-up question (currently only AIF's investor
     type), or None when the entity resolves in a single step.
     """
-    icons = {
-        "aif": "TrendingUp",
-        "bank": "Landmark",
-        "gic": "Puzzle",
-        "lease": "Plane",
-        "insure": "Shield",
-        "fintech": "Zap",
-        "broker": "LineChart",
-    }
     out = []
     for eid, e in load_entities().items():
         out.append(
             {
                 "key": eid,
-                "icon": icons.get(eid, "HelpCircle"),
                 "name": e["name"],
                 "tag": e["tag"],
                 "branch": e.get("branches", {}).get("investor_type"),

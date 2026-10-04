@@ -13,7 +13,7 @@ export default function TaxCalculator({ entityId }) {
     api.taxRules().then(setRules).catch((e) => setErr(e.message));
   }, []);
 
-  if (err) return <div className="error-msg">Couldn't load the tax estimator: {err}</div>;
+  if (err) return <div className="error-msg">The tax estimator didn't load: {err}</div>;
   if (!rules) return <p className="state-msg">Loading tax estimator…</p>;
   return <Calculator rules={rules} entityId={entityId} />;
 }
@@ -85,10 +85,10 @@ function Calculator({ rules, entityId }) {
 
   return (
     <div className="calc" onChange={logUse}>
-      <h3>Estimate your tax saving</h3>
+      <h2>Estimated tax saving</h2>
       <p className="hint">
-        Compares tax onshore vs the GIFT IFSC tax holiday on eligible income, projected
-        across the block period.
+        Tax on eligible income if the business stayed onshore, against the same income
+        under the GIFT IFSC tax holiday, added up over the block period.
       </p>
 
       <div className="field">
@@ -123,7 +123,7 @@ function Calculator({ rules, entityId }) {
         <label>
           <input type="checkbox" checked={advanced}
             onChange={(e) => setAdvanced(e.target.checked)} />
-          Advanced: add surcharge, cess &amp; minimum alternate tax (MAT)
+          Include surcharge, cess and minimum alternate tax (MAT)
         </label>
       </div>
 
@@ -154,7 +154,7 @@ function Calculator({ rules, entityId }) {
               <div className="k">Onshore tax / year</div>
               <div className="v">{fmtUSD(result.onshore_tax_annual)}</div>
             </div>
-            <div className="stat win">
+            <div className="stat">
               <div className="k">
                 IFSC tax / year {result.apply_mat ? "(MAT)" : ""}
               </div>
@@ -166,7 +166,7 @@ function Calculator({ rules, entityId }) {
             </div>
           </div>
 
-          <h4 className="chart-title">Cumulative saving across the block</h4>
+          <h3 className="chart-title">Cumulative saving over the block period</h3>
           <CumulativeChart series={result.series} holidayYears={result.holiday_years} />
 
           <p className="disclaimer">{result.disclaimer}</p>

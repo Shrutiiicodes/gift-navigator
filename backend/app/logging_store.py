@@ -106,7 +106,7 @@ def log_feedback(
 # The funnel stages, in order. Each maps to an event 'kind'.
 FUNNEL_STAGES = ["start", "recommend", "tax_view", "feedback"]
 _STAGE_LABELS = {
-    "start": "Started navigator",
+    "start": "Opened the navigator",
     "recommend": "Got a recommendation",
     "tax_view": "Used tax estimate",
     "feedback": "Left feedback",

@@ -10,7 +10,7 @@ export default function CumulativeChart({ series, holidayYears }) {
 
     const W = 640;
     const H = 200;
-    const padL = 56;
+    const padL = 76;
     const padR = 14;
     const padT = 14;
     const padB = 28;
@@ -48,7 +48,7 @@ export default function CumulativeChart({ series, holidayYears }) {
                         <line x1={padL} y1={t.yy} x2={W - padR} y2={t.yy}
                             stroke="var(--line)" strokeWidth="1" />
                         <text x={padL - 8} y={t.yy + 4} textAnchor="end"
-                            fontFamily="var(--mono)" fontSize="10" fill="var(--muted)">
+                            fontSize="11" fill="var(--muted)">
                             {fmtUSD(t.v)}
                         </text>
                     </g>
@@ -56,27 +56,27 @@ export default function CumulativeChart({ series, holidayYears }) {
 
                 {/* holiday phase shading */}
                 <rect x={padL} y={padT} width={boundaryX - padL} height={innerH}
-                    fill="var(--saffron)" opacity="0.07" />
+                    fill="var(--ink)" opacity="0.04" />
                 <line x1={boundaryX} y1={padT} x2={boundaryX} y2={padT + innerH}
-                    stroke="var(--saffron-deep)" strokeWidth="1" strokeDasharray="4 3" />
+                    stroke="var(--muted)" strokeWidth="1" strokeDasharray="4 3" />
                 <text x={boundaryX} y={padT + innerH + 18} textAnchor="middle"
-                    fontFamily="var(--mono)" fontSize="10" fill="var(--saffron-deep)">
+                    fontSize="11" fill="var(--muted)">
                     holiday ends (yr {holidayYears})
                 </text>
 
                 {/* area + line */}
-                <path d={areaPath} fill="var(--green)" opacity="0.12" />
-                <path d={linePath} fill="none" stroke="var(--green)" strokeWidth="2.5" />
+                <path d={areaPath} fill="var(--pos)" opacity="0.12" />
+                <path d={linePath} fill="none" stroke="var(--pos)" strokeWidth="2.5" />
 
                 {/* end marker */}
                 <circle cx={x(n - 1)} cy={y(series[n - 1].saving_cumulative)} r="4"
-                    fill="var(--green)" />
+                    fill="var(--pos)" />
 
                 {/* x-axis end labels */}
                 <text x={padL} y={H - 8} textAnchor="start"
-                    fontFamily="var(--mono)" fontSize="10" fill="var(--muted)">yr 1</text>
+                    fontSize="11" fill="var(--muted)">yr 1</text>
                 <text x={W - padR} y={H - 8} textAnchor="end"
-                    fontFamily="var(--mono)" fontSize="10" fill="var(--muted)">yr {n}</text>
+                    fontSize="11" fill="var(--muted)">yr {n}</text>
             </svg>
             <p className="chart-cap">
                 Cumulative saving reaches <strong>{fmtUSD(series[n - 1].saving_cumulative)}</strong> over {n} years.

@@ -91,7 +91,7 @@ reduces exactly to the original first-order model and the original tests still h
 
 ## Usage analytics
 
-Client-side funnel stages are logged through `/event`: `start` when the navigator is
+Client-side funnel stages are logged through `/event`: `start` when the page is
 opened and `tax_view` the first time the user changes a tax-estimator input for a given
 recommendation. `recommend` and `feedback` are logged server-side from their own routes.
 Each funnel stage counts distinct sessions, not events, so a user who restarts several
