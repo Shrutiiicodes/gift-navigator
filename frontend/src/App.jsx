@@ -8,24 +8,30 @@ import ComparisonTable from "./components/ComparisonTable.jsx";
 import AnalyticsPanel from "./components/AnalyticsPanel.jsx";
 
 function Feedback({ entityId }) {
-  const [done, setDone] = useState(false);
+  const [comment, setComment] = useState("");
+  const [state, setState] = useState("idle"); // idle | done | failed
   async function send(helpful) {
     try {
-      await api.feedback(entityId, helpful, null);
-    } finally {
-      setDone(true);
+      await api.feedback(entityId, helpful, comment.trim() || null);
+      setState("done");
+    } catch (_) {
+      setState("failed");
     }
   }
-  if (done) return <div className="fb"><span className="done">Thanks — logged.</span></div>;
+  if (state === "done") return <div className="fb"><span className="done">Thanks — logged.</span></div>;
   return (
     <div className="fb">
-      <span>Was this recommendation useful?</span>
-      <button onClick={() => send(true)} style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
-        <ThumbsUp size={14} style={{ strokeWidth: 2 }} /> Yes
+      <label htmlFor="fb-comment">Was this recommendation useful?</label>
+      <input id="fb-comment" type="text" maxLength={2000} value={comment}
+        placeholder="Optional: what worked or what was missing?"
+        onChange={(e) => setComment(e.target.value)} />
+      <button className="btn-icon" onClick={() => send(true)}>
+        <ThumbsUp size={14} strokeWidth={2} /> Yes
       </button>
-      <button onClick={() => send(false)} style={{ display: "inline-flex", alignItems: "center", gap: "6px" }}>
-        <ThumbsDown size={14} style={{ strokeWidth: 2 }} /> No
+      <button className="btn-icon" onClick={() => send(false)}>
+        <ThumbsDown size={14} strokeWidth={2} /> No
       </button>
+      {state === "failed" && <span role="alert">Couldn't save that — try again.</span>}
     </div>
   );
 }
@@ -33,13 +39,18 @@ function Feedback({ entityId }) {
 export default function App() {
   const [started, setStarted] = useState(false);
   const [result, setResult] = useState(null);
+  const [why, setWhy] = useState(null); // set when free-text routing chose the structure
   const [showAnalytics, setShowAnalytics] = useState(false);
 
-  // Log entering the tax estimate step (funnel stage). recommend + feedback
-  // are logged server-side, so we only log the client-only stages here.
+  // The free-tier backend sleeps when idle; start waking it as the page loads.
   useEffect(() => {
-    if (result) api.event("tax_view", result.id);
-  }, [result]);
+    api.health().catch(() => {});
+  }, []);
+
+  function showResult(r, reason = null) {
+    setResult(r);
+    setWhy(reason);
+  }
 
   function start() {
     setStarted(true);
@@ -90,8 +101,8 @@ export default function App() {
               <p className="eyebrow">India's International Financial Services Centre</p>
               <h2>Find the right way to set up in GIFT City — in under a minute.</h2>
               <p>
-                Six entity structures, six rulebooks. Answer a few questions and get the
-                structure that fits you, what you'd need to qualify, and how much tax
+                Every entity structure has its own rulebook. Answer a few questions and get
+                the structure that fits you, what you'd need to qualify, and how much tax
                 you'd save versus staying onshore.
               </p>
               <button className="start-btn" onClick={start}>
@@ -108,11 +119,19 @@ export default function App() {
                     Tap <strong>Start the navigator</strong> above to begin.
                   </p>
                 )}
-                {started && !result && <Wizard onResult={setResult} />}
+                {started && !result && <Wizard onResult={showResult} />}
                 {result && (
                   <div className="result">
+                    {why && (
+                      <p className="why">
+                        Why this structure: {why}{" "}
+                        <button className="linklike" onClick={restart}>
+                          Not right? Choose manually
+                        </button>
+                      </p>
+                    )}
                     <EntityCard result={result} />
-                    <TaxCalculator />
+                    <TaxCalculator entityId={result.id} />
                     <Feedback entityId={result.id} />
                     <div className="restart">
                       <button onClick={restart}>↺ Start over</button>

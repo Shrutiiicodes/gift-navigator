@@ -27,7 +27,7 @@ export default function AnalyticsPanel() {
                 <div className="abars">
                     {data.most_queried.map((m) => (
                         <div className="abar-row" key={m.entity_id}>
-                            <div className="abar-label">{m.entity_id}</div>
+                            <div className="abar-label" title={m.name}>{m.name}</div>
                             <div className="abar-track">
                                 <div className="abar-fill"
                                     style={{ width: `${(m.count / maxQ) * 100}%` }}>
@@ -39,7 +39,7 @@ export default function AnalyticsPanel() {
                 </div>
             )}
 
-            <h3 style={{ marginTop: "26px" }}>Where users drop off</h3>
+            <h3 className="gap-top">Where users drop off</h3>
             <div className="funnel">
                 {data.funnel.map((f) => (
                     <div className="funnel-row" key={f.stage}>
@@ -53,14 +53,17 @@ export default function AnalyticsPanel() {
                         <div className="funnel-drop">
                             {f.drop_from_prev_pct === null
                                 ? "—"
+                                : f.drop_from_prev_pct === 0
+                                ? "0%"
                                 : `−${f.drop_from_prev_pct}%`}
                         </div>
                     </div>
                 ))}
             </div>
-            <p className="state-msg" style={{ marginTop: "14px" }}>
-                Drop-off is the share lost from the previous step. Data is logged anonymously as
-                you and others use the tool.
+            <p className="state-msg gap-top">
+                Counts are visits (one per browser tab), so repeat clicks don't inflate a step.
+                Drop-off is the share lost from the previous step. Feedback so far:{" "}
+                {data.feedback.helpful} of {data.feedback.total} found the recommendation useful.
             </p>
         </div>
     );

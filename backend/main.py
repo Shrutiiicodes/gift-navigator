@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import os
+import secrets
+from typing import Optional
 
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, Header, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
 from app import classifier, logging_store, rules_engine, tax_engine
@@ -35,11 +37,6 @@ app.add_middleware(
 )
 
 
-@app.on_event("startup")
-def _startup() -> None:
-    logging_store.init_db()
-
-
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
@@ -57,7 +54,9 @@ def recommend(req: RecommendRequest) -> RecommendResponse:
         result = rules_engine.recommend(req.entity_id, req.investor_type)
     except KeyError:
         raise HTTPException(status_code=404, detail=f"Unknown entity '{req.entity_id}'")
-    logging_store.log_event("recommend", req.entity_id, {"investor_type": req.investor_type})
+    logging_store.log_event(
+        "recommend", req.entity_id, {"investor_type": req.investor_type}, req.session_id
+    )
     return RecommendResponse(**result)
 
 
@@ -81,15 +80,31 @@ def tax_estimate(req: TaxRequest) -> TaxResponse:
 
 @app.post("/event", response_model=EventResponse)
 def event(req: EventRequest) -> EventResponse:
-    """Client-side funnel events (e.g. 'start', 'tax_view')."""
-    logging_store.log_event(req.kind, req.entity_id)
+    """Client-side funnel events ('start', 'tax_view')."""
+    logging_store.log_event(req.kind, req.entity_id, session_id=req.session_id)
     return EventResponse(ok=True)
 
 
 @app.get("/analytics")
 def analytics() -> dict:
-    """Most-queried structures and the usage funnel with drop-off."""
-    return logging_store.analytics()
+    """Most-queried structures, feedback totals, and the per-session funnel."""
+    data = logging_store.analytics()
+    entities = rules_engine.load_entities()
+    for row in data["most_queried"]:
+        row["name"] = entities.get(row["entity_id"], {}).get("name", row["entity_id"])
+    return data
+
+
+@app.get("/export")
+def export(x_admin_token: Optional[str] = Header(None)) -> dict:
+    """Raw events + feedback (includes free-text comments). Disabled unless
+    ADMIN_TOKEN is set; callers must send it as the X-Admin-Token header."""
+    token = os.environ.get("ADMIN_TOKEN")
+    if not token:
+        raise HTTPException(status_code=404, detail="Export is not enabled")
+    if not secrets.compare_digest((x_admin_token or "").encode(), token.encode()):
+        raise HTTPException(status_code=401, detail="Invalid admin token")
+    return logging_store.export()
 
 
 @app.get("/tax/rules")
@@ -101,16 +116,15 @@ def tax_rules() -> dict:
 @app.post("/classify", response_model=ClassifyResponse)
 def classify(req: ClassifyRequest) -> ClassifyResponse:
     result = classifier.classify(req.text)
-    logging_store.log_event("classify", result["entity_id"], {"method": result["method"]})
+    logging_store.log_event(
+        "classify", result["entity_id"], {"method": result["method"]}, req.session_id
+    )
     return ClassifyResponse(**result)
 
 
 @app.post("/feedback", response_model=FeedbackResponse)
 def feedback(req: FeedbackRequest) -> FeedbackResponse:
-    fid = logging_store.log_feedback(req.entity_id, req.helpful, req.comment)
+    fid = logging_store.log_feedback(
+        req.entity_id, req.helpful, req.comment, req.session_id
+    )
     return FeedbackResponse(ok=True, feedback_id=fid)
-
-
-@app.get("/stats")
-def stats() -> dict:
-    return logging_store.stats()

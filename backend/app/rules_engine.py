@@ -14,10 +14,14 @@ DATA_DIR = Path(__file__).parent / "data"
 
 
 @lru_cache(maxsize=1)
+def _load_raw() -> dict[str, Any]:
+    return json.loads((DATA_DIR / "entities.json").read_text(encoding="utf-8"))
+
+
+@lru_cache(maxsize=1)
 def load_entities() -> dict[str, dict[str, Any]]:
     """Load entities.json and index it by id. Cached after first read."""
-    raw = json.loads((DATA_DIR / "entities.json").read_text(encoding="utf-8"))
-    return {e["id"]: e for e in raw["entities"]}
+    return {e["id"]: e for e in _load_raw()["entities"]}
 
 
 def list_entity_ids() -> list[str]:
@@ -87,11 +91,16 @@ def recommend(entity_id: str, investor_type: Optional[str] = None) -> dict[str, 
         "eligibility": _resolve_eligibility(entity, investor_type),
         "timeline_label": _timeline_label(entity),
         "activities": entity["activities"],
+        "last_reviewed": _load_raw()["_meta"].get("last_reviewed"),
     }
 
 
-def wizard_options() -> list[dict[str, str]]:
-    """Surface the first-step wizard options (one card per entity)."""
+def wizard_options() -> list[dict[str, Any]]:
+    """Surface the first-step wizard options (one card per entity).
+
+    `branch` is the entity's follow-up question (currently only AIF's investor
+    type), or None when the entity resolves in a single step.
+    """
     icons = {
         "aif": "TrendingUp",
         "bank": "Landmark",
@@ -107,9 +116,9 @@ def wizard_options() -> list[dict[str, str]]:
             {
                 "key": eid,
                 "icon": icons.get(eid, "HelpCircle"),
-                "title": e["what"].split(".")[0],
                 "name": e["name"],
                 "tag": e["tag"],
+                "branch": e.get("branches", {}).get("investor_type"),
             }
         )
     return out

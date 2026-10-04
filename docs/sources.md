@@ -40,8 +40,9 @@ current circular / Act and replace the "Status" with the version and date you co
 
 ## Stated model limitations
 
-- The tax estimator ignores minimum alternate tax (MAT), surcharge, cess, GST and
-  entity-specific rules.
+- The tax estimator's simple mode ignores minimum alternate tax (MAT), surcharge and
+  cess; advanced mode models them using the indicative rates above. Both modes ignore GST
+  and entity-specific rules.
 - Recommendations are eligibility routing, not legal advice.
 - Keyword classification has no full stemmer (lightweight plural tolerance only); the LLM
   fallback mitigates this but carries its own non-zero misclassification rate, quantified

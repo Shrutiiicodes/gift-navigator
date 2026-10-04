@@ -1,30 +1,35 @@
 """SQLite-backed logging for recommendation events and user feedback.
 
-The event log doubles as a usage dataset for the evaluation chapter.
+The event log doubles as the usage dataset behind the analytics funnel.
 """
 from __future__ import annotations
 
 import json
 import os
 import sqlite3
+from contextlib import contextmanager
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Optional
+from typing import Any, Iterator, Optional
 
 DB_PATH = Path(os.environ.get("GIFT_DB_PATH", Path(__file__).parent / "gift.db"))
 
+_ready: set[str] = set()  # DB paths whose tables have been created/migrated
 
-_initialized = False
 
-
-def _conn() -> sqlite3.Connection:
-    global _initialized
+@contextmanager
+def _conn() -> Iterator[sqlite3.Connection]:
+    """Open a connection, commit on success, and always close it."""
     conn = sqlite3.connect(DB_PATH)
     conn.row_factory = sqlite3.Row
-    if not _initialized:
-        _create_tables(conn)
-        _initialized = True
-    return conn
+    try:
+        with conn:
+            if str(DB_PATH) not in _ready:
+                _create_tables(conn)
+                _ready.add(str(DB_PATH))
+            yield conn
+    finally:
+        conn.close()
 
 
 def _create_tables(conn: sqlite3.Connection) -> None:
@@ -35,7 +40,8 @@ def _create_tables(conn: sqlite3.Connection) -> None:
             ts TEXT NOT NULL,
             kind TEXT NOT NULL,
             entity_id TEXT,
-            payload TEXT
+            payload TEXT,
+            session_id TEXT
         )
         """
     )
@@ -46,53 +52,55 @@ def _create_tables(conn: sqlite3.Connection) -> None:
             ts TEXT NOT NULL,
             entity_id TEXT,
             helpful INTEGER NOT NULL,
-            comment TEXT
+            comment TEXT,
+            session_id TEXT
         )
         """
     )
-
-
-def init_db() -> None:
-    with _conn() as conn:
-        _create_tables(conn)
+    # Databases created before session tracking lack the column; old rows keep NULL.
+    for table in ("events", "feedback"):
+        cols = [r["name"] for r in conn.execute(f"PRAGMA table_info({table})")]
+        if "session_id" not in cols:
+            conn.execute(f"ALTER TABLE {table} ADD COLUMN session_id TEXT")
 
 
 def _now() -> str:
     return datetime.now(timezone.utc).isoformat()
 
 
-def log_event(kind: str, entity_id: Optional[str] = None, payload: Any = None) -> None:
+def log_event(
+    kind: str,
+    entity_id: Optional[str] = None,
+    payload: Any = None,
+    session_id: Optional[str] = None,
+) -> None:
     with _conn() as conn:
         conn.execute(
-            "INSERT INTO events (ts, kind, entity_id, payload) VALUES (?, ?, ?, ?)",
-            (_now(), kind, entity_id, json.dumps(payload) if payload is not None else None),
+            "INSERT INTO events (ts, kind, entity_id, payload, session_id) "
+            "VALUES (?, ?, ?, ?, ?)",
+            (
+                _now(),
+                kind,
+                entity_id,
+                json.dumps(payload) if payload is not None else None,
+                session_id,
+            ),
         )
 
 
-def log_feedback(entity_id: str, helpful: bool, comment: Optional[str]) -> int:
+def log_feedback(
+    entity_id: str,
+    helpful: bool,
+    comment: Optional[str],
+    session_id: Optional[str] = None,
+) -> int:
     with _conn() as conn:
         cur = conn.execute(
-            "INSERT INTO feedback (ts, entity_id, helpful, comment) VALUES (?, ?, ?, ?)",
-            (_now(), entity_id, 1 if helpful else 0, comment),
+            "INSERT INTO feedback (ts, entity_id, helpful, comment, session_id) "
+            "VALUES (?, ?, ?, ?, ?)",
+            (_now(), entity_id, 1 if helpful else 0, comment, session_id),
         )
         return int(cur.lastrowid)
-
-
-def stats() -> dict[str, Any]:
-    """Aggregate counts for a simple admin/usage view."""
-    with _conn() as conn:
-        by_entity = conn.execute(
-            "SELECT entity_id, COUNT(*) c FROM events WHERE kind='recommend' "
-            "GROUP BY entity_id ORDER BY c DESC"
-        ).fetchall()
-        fb = conn.execute(
-            "SELECT SUM(helpful) helpful, COUNT(*) total FROM feedback"
-        ).fetchone()
-    return {
-        "recommendations_by_entity": {r["entity_id"]: r["c"] for r in by_entity},
-        "feedback_helpful": fb["helpful"] or 0,
-        "feedback_total": fb["total"] or 0,
-    }
 
 
 # The funnel stages, in order. Each maps to an event 'kind'.
@@ -100,27 +108,34 @@ FUNNEL_STAGES = ["start", "recommend", "tax_view", "feedback"]
 _STAGE_LABELS = {
     "start": "Started navigator",
     "recommend": "Got a recommendation",
-    "tax_view": "Opened tax estimate",
+    "tax_view": "Used tax estimate",
     "feedback": "Left feedback",
 }
 
+# Count each session once per stage. Rows without a session id (logged before
+# session tracking existed) each count as their own session.
+_SESSIONS = "COUNT(DISTINCT COALESCE(session_id, 'row-' || id))"
+
 
 def analytics() -> dict[str, Any]:
-    """Most-queried structures plus a funnel with step-over-step drop-off."""
+    """Most-queried structures, feedback totals, and a per-session funnel."""
     with _conn() as conn:
         counts = {
             row["kind"]: row["c"]
             for row in conn.execute(
-                "SELECT kind, COUNT(*) c FROM events GROUP BY kind"
+                f"SELECT kind, {_SESSIONS} c FROM events GROUP BY kind"
             ).fetchall()
         }
-        fb_total = conn.execute("SELECT COUNT(*) c FROM feedback").fetchone()["c"]
+        fb = conn.execute(
+            f"SELECT {_SESSIONS} sessions, COUNT(*) total, SUM(helpful) helpful "
+            "FROM feedback"
+        ).fetchone()
         by_entity = conn.execute(
             "SELECT entity_id, COUNT(*) c FROM events WHERE kind='recommend' "
             "AND entity_id IS NOT NULL GROUP BY entity_id ORDER BY c DESC"
         ).fetchall()
 
-    counts["feedback"] = fb_total  # feedback lives in its own table
+    counts["feedback"] = fb["sessions"]  # feedback lives in its own table
 
     funnel = []
     prev = None
@@ -144,4 +159,14 @@ def analytics() -> dict[str, Any]:
             {"entity_id": r["entity_id"], "count": r["c"]} for r in by_entity
         ],
         "funnel": funnel,
+        "feedback": {"helpful": fb["helpful"] or 0, "total": fb["total"]},
     }
+
+
+def export() -> dict[str, list[dict[str, Any]]]:
+    """Every raw event and feedback row, for pulling the data off the host."""
+    with _conn() as conn:
+        return {
+            table: [dict(r) for r in conn.execute(f"SELECT * FROM {table} ORDER BY id")]
+            for table in ("events", "feedback")
+        }

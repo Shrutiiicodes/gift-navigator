@@ -50,7 +50,8 @@ def run() -> dict:
 
         by_method[method]["total"] += 1
         by_difficulty[difficulty]["total"] += 1
-        confusion[expected][predicted] += 1
+        if predicted is not None:  # a no-match is wrong, but has no column
+            confusion[expected][predicted] += 1
         if is_correct:
             correct += 1
             by_method[method]["correct"] += 1
@@ -86,7 +87,7 @@ def run() -> dict:
         "confusion": confusion,
         "failures": failures,
         "entity_ids": ids,
-        "llm_enabled": classifier.os.environ.get("ANTHROPIC_API_KEY") is not None,
+        "llm_enabled": bool(classifier.os.environ.get("GROQ_API_KEY")),
     }
 
 

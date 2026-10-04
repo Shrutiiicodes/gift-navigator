@@ -18,9 +18,9 @@ Find the right way to set up in **GIFT City** — India's International Financia
   - *Simple mode:* headline rate comparison with cumulative savings.
   - *Advanced mode:* layers in surcharge, cess, and optional MAT (minimum alternate tax), with a year-by-year cumulative chart.
 - **Comparison table** — side-by-side view across the available structures and hubs.
-- **Free-text intake** — describe your situation in plain language and get classified to a structure. A hybrid classifier scores keywords first (fast, free, deterministic) and only escalates to a Groq-hosted LLM when keyword confidence is low.
-- **Usage analytics** — a built-in funnel (start → recommend → tax view → feedback) with step-over-step drop-off, plus a "most queried" breakdown.
-- **Feedback loop** — thumbs up/down on each recommendation, logged for review.
+- **Free-text intake** — describe your situation in plain language and get classified to a structure. A hybrid classifier scores keywords first (fast, free, deterministic) and only escalates to a Groq-hosted LLM when keyword evidence is weak (a single hit, a tie, or low confidence). If nothing matches it says so rather than guessing.
+- **Usage analytics** — a built-in funnel (start → recommend → tax estimate used → feedback) counted per anonymous session, with step-over-step drop-off, plus a "most queried" breakdown.
+- **Feedback loop** — thumbs up/down with an optional comment on each recommendation, logged for review.
 
 ---
 
@@ -45,7 +45,8 @@ python -m venv .venv
 # macOS/Linux:
 source .venv/bin/activate
 
-pip install -r requirements.txt
+pip install -r requirements-dev.txt   # runtime deps + pytest/httpx
+cp .env.example .env                  # optional: add GROQ_API_KEY for the LLM fallback
 uvicorn main:app --reload --port 8000
 ```
 
@@ -69,7 +70,7 @@ App runs at `http://localhost:5173`.
 
 ```bash
 cd backend
-python -m pytest -q          # unit tests
+python -m pytest -q          # unit + API tests, incl. a golden-set regression gate
 python -m eval.run_eval      # classifier accuracy against golden cases
 ```
 
@@ -87,8 +88,8 @@ python -m eval.run_eval      # classifier accuracy against golden cases
 | `POST` | `/classify` | Classify free-text into a structure |
 | `POST` | `/feedback` | Log thumbs up/down on a recommendation |
 | `POST` | `/event` | Log a client-side funnel event |
-| `GET` | `/analytics` | Usage funnel + most-queried structures |
-| `GET` | `/stats` | Aggregate logging stats |
+| `GET` | `/analytics` | Per-session usage funnel, most-queried structures, feedback totals |
+| `GET` | `/export` | Raw events + feedback as JSON (needs `ADMIN_TOKEN`, sent as `X-Admin-Token`) |
 
 Full schemas are visible in the live Swagger UI at [`/docs`](https://gift-navigator-api.onrender.com/docs).
 
@@ -108,7 +109,7 @@ gift-navigator/
 │   │   ├── schemas.py          # Pydantic request/response models
 │   │   └── data/               # entities.json, tax_rules.json
 │   ├── eval/                   # golden cases + accuracy harness
-│   └── tests/                  # pytest suite
+│   └── tests/                  # pytest suite (engines, classifier, API)
 ├── frontend/
 │   └── src/
 │       ├── App.jsx
@@ -126,9 +127,14 @@ gift-navigator/
 The live demo is split across two free hosts:
 
 - **Frontend → Vercel.** Root directory `frontend`, framework auto-detected as Vite. Set `VITE_API_URL` (no trailing slash) to the backend URL. Vite bakes env vars in at build time, so changing it requires a redeploy.
-- **Backend → Render.** Root directory `backend`, Python pinned to **3.12** (via `PYTHON_VERSION` or `backend/.python-version` — 3.14 lacks prebuilt `pydantic-core` wheels). Start command: `uvicorn main:app --host 0.0.0.0 --port $PORT`. Set `FRONTEND_ORIGIN` to your Vercel URL to lock down CORS (defaults to `*`). Set `GROQ_API_KEY` to enable the LLM free-text fallback (falls back to keyword-only if unset).
+- **Backend → Render.** Root directory `backend`, Python pinned to **3.12** (via `PYTHON_VERSION` or `backend/.python-version` — 3.14 lacks prebuilt `pydantic-core` wheels). Start command: `uvicorn main:app --host 0.0.0.0 --port $PORT`. Environment variables:
+  - `FRONTEND_ORIGIN` — **set this in production** to your Vercel URL. CORS defaults to `*`, which is only appropriate for local development.
+  - `GROQ_API_KEY` — enables the LLM free-text fallback (keyword-only if unset).
+  - `LLM_DAILY_CAP` — maximum LLM calls per day per process (default 200); beyond it the classifier behaves as keyword-only.
+  - `ADMIN_TOKEN` — enables `GET /export`. Without it the endpoint returns 404.
+  - `GIFT_DB_PATH` — where the SQLite file lives (defaults to `backend/app/gift.db`).
 
-> The free Render disk is ephemeral, so SQLite analytics/feedback reset on restart — fine for a demo. For durable data, attach a persistent disk or swap to a hosted Postgres.
+> The free Render disk is ephemeral, so SQLite analytics/feedback reset on restart — fine for a demo. To keep the data, pull it down with `curl -H "X-Admin-Token: $ADMIN_TOKEN" https://<api>/export` before the service sleeps, or attach a persistent disk (point `GIFT_DB_PATH` at it) or swap to a hosted Postgres.
 
 ---
 

@@ -1,19 +1,61 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { api } from "../api/client.js";
 import { fmtUSD } from "../lib/format.js";
 import CumulativeChart from "./CumulativeChart.jsx";
 
-export default function TaxCalculator() {
+// Loads the tax parameters once so bounds and defaults come from tax_rules.json,
+// not from copies in this file.
+export default function TaxCalculator({ entityId }) {
+  const [rules, setRules] = useState(null);
+  const [err, setErr] = useState("");
+
+  useEffect(() => {
+    api.taxRules().then(setRules).catch((e) => setErr(e.message));
+  }, []);
+
+  if (err) return <div className="error-msg">Couldn't load the tax estimator: {err}</div>;
+  if (!rules) return <p className="state-msg">Loading tax estimator…</p>;
+  return <Calculator rules={rules} entityId={entityId} />;
+}
+
+function PctField({ id, label, hint, value, onChange }) {
+  return (
+    <div className="field">
+      <label htmlFor={id}>{label} <span>{hint}</span></label>
+      <div className="inrow">
+        <input id={id} type="number" min="0" max="100" step="1" value={value}
+          onChange={(e) => onChange(e.target.value)} />
+        <span className="pfx sfx">%</span>
+      </div>
+    </div>
+  );
+}
+
+function Calculator({ rules, entityId }) {
+  const rateBounds = rules.onshore_rate_bounds_pct;
+  const blockBounds = rules.block_period_bounds_years;
+  const adv = rules.advanced_defaults;
+  const s80 = rules.section_80la;
+
   const [income, setIncome] = useState(2000000);
-  const [rate, setRate] = useState(25);
-  const [block, setBlock] = useState(25);
+  const [rate, setRate] = useState(rules.onshore_default_rate_pct);
+  const [block, setBlock] = useState(s80.block_period_years);
   const [advanced, setAdvanced] = useState(false);
-  const [surcharge, setSurcharge] = useState(12);
-  const [cess, setCess] = useState(4);
-  const [mat, setMat] = useState(9);
+  const [surcharge, setSurcharge] = useState(adv.surcharge_pct);
+  const [cess, setCess] = useState(adv.cess_pct);
+  const [mat, setMat] = useState(adv.mat_rate_pct);
   const [applyMat, setApplyMat] = useState(true);
   const [result, setResult] = useState(null);
   const [err, setErr] = useState("");
+
+  // Funnel stage "tax_view": the user actually touched the estimator, logged
+  // once per recommendation (this component remounts for each new result).
+  const logged = useRef(false);
+  function logUse() {
+    if (logged.current) return;
+    logged.current = true;
+    api.event("tax_view", entityId);
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -42,7 +84,7 @@ export default function TaxCalculator() {
   }, [income, rate, block, advanced, surcharge, cess, mat, applyMat]);
 
   return (
-    <div className="calc">
+    <div className="calc" onChange={logUse}>
       <h3>Estimate your tax saving</h3>
       <p className="hint">
         Compares tax onshore vs the GIFT IFSC tax holiday on eligible income, projected
@@ -64,16 +106,16 @@ export default function TaxCalculator() {
         <label htmlFor="rate">
           Onshore tax rate you'd otherwise pay: <span className="rate-val">{rate}%</span>
         </label>
-        <input id="rate" type="range" min="9" max="35" value={rate}
+        <input id="rate" type="range" min={rateBounds.min} max={rateBounds.max} value={rate}
           onChange={(e) => setRate(e.target.value)} />
       </div>
 
       <div className="field">
         <label htmlFor="block">
           Block period to model: <span className="rate-val">{block} years</span>{" "}
-          <span>(10-year holiday + concessional tail)</span>
+          <span>({s80.holiday_years}-year holiday + concessional tail)</span>
         </label>
-        <input id="block" type="range" min="10" max="25" value={block}
+        <input id="block" type="range" min={blockBounds.min} max={blockBounds.max} value={block}
           onChange={(e) => setBlock(e.target.value)} />
       </div>
 
@@ -87,30 +129,12 @@ export default function TaxCalculator() {
 
       {advanced && (
         <div className="adv-grid">
-          <div className="field">
-            <label htmlFor="sur">Surcharge <span>(% of tax)</span></label>
-            <div className="inrow">
-              <input id="sur" type="number" min="0" step="1" value={surcharge}
-                onChange={(e) => setSurcharge(e.target.value)} />
-              <span className="pfx" style={{ borderLeft: "1px solid var(--line)", borderRight: "none" }}>%</span>
-            </div>
-          </div>
-          <div className="field">
-            <label htmlFor="cess">Cess <span>(% of tax+surcharge)</span></label>
-            <div className="inrow">
-              <input id="cess" type="number" min="0" step="1" value={cess}
-                onChange={(e) => setCess(e.target.value)} />
-              <span className="pfx" style={{ borderLeft: "1px solid var(--line)", borderRight: "none" }}>%</span>
-            </div>
-          </div>
-          <div className="field">
-            <label htmlFor="mat">MAT rate <span>(on book profit)</span></label>
-            <div className="inrow">
-              <input id="mat" type="number" min="0" step="1" value={mat}
-                onChange={(e) => setMat(e.target.value)} />
-              <span className="pfx" style={{ borderLeft: "1px solid var(--line)", borderRight: "none" }}>%</span>
-            </div>
-          </div>
+          <PctField id="sur" label="Surcharge" hint="(% of tax)"
+            value={surcharge} onChange={setSurcharge} />
+          <PctField id="cess" label="Cess" hint="(% of tax+surcharge)"
+            value={cess} onChange={setCess} />
+          <PctField id="mat" label="MAT rate" hint="(on book profit)"
+            value={mat} onChange={setMat} />
           <div className="field adv-check">
             <label>
               <input type="checkbox" checked={applyMat}

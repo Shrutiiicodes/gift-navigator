@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { api } from "../api/client.js";
+import { api, BASE } from "../api/client.js";
 import FreeTextIntake from "./FreeTextIntake.jsx";
 import {
   TrendingUp,
@@ -23,20 +23,25 @@ const iconMap = {
   Shield,
   Zap,
   LineChart,
-  HelpCircle
+  HelpCircle,
+  // branch option ids
+  retail: Users,
+  nonretail: Handshake
 };
 
 function OptionIcon({ name }) {
   const Icon = iconMap[name] || HelpCircle;
-  return <Icon size={20} style={{ strokeWidth: 2, verticalAlign: "middle" }} />;
+  return <Icon size={20} strokeWidth={2} />;
 }
 
 
 export default function Wizard({ onResult }) {
-  const [options, setOptions] = useState([]);
+  const [options, setOptions] = useState(null);
   const [loadErr, setLoadErr] = useState("");
-  const [step, setStep] = useState(1);
-  const [entity, setEntity] = useState(null);
+  const [entity, setEntity] = useState(null); // option awaiting its branch answer
+  const [why, setWhy] = useState(null);
+  const [busy, setBusy] = useState(false);
+  const [err, setErr] = useState("");
 
   useEffect(() => {
     api
@@ -45,59 +50,74 @@ export default function Wizard({ onResult }) {
       .catch((e) => setLoadErr(e.message));
   }, []);
 
-  async function pick(entityId) {
-    if (entityId === "aif") {
-      setEntity(entityId);
-      setStep(2);
-    } else {
-      const result = await api.recommend(entityId, null);
-      onResult(result);
+  async function recommend(entityId, investorType, reason) {
+    setBusy(true);
+    setErr("");
+    try {
+      onResult(await api.recommend(entityId, investorType), reason);
+    } catch (e) {
+      setErr(`Couldn't load that recommendation: ${e.message}`);
+    } finally {
+      setBusy(false);
     }
   }
 
-  async function pickInvestor(investorType) {
-    const result = await api.recommend(entity, investorType);
-    onResult(result);
+  // `reason` is set when the free-text classifier (not the user) chose the entity.
+  function pick(entityId, reason = null) {
+    const option = options.find((o) => o.key === entityId);
+    if (option?.branch) {
+      setEntity(option);
+      setWhy(reason);
+      setErr("");
+    } else {
+      recommend(entityId, null, reason);
+    }
   }
 
   if (loadErr) {
     return (
       <div className="error-msg">
-        Couldn't reach the API at {import.meta.env.VITE_API_URL || "localhost:8000"}.
-        Start the backend, or check VITE_API_URL. ({loadErr})
+        Couldn't reach the API at {BASE}. Start the backend, or check VITE_API_URL. ({loadErr})
       </div>
     );
   }
 
-  if (step === 2) {
+  if (!options) {
+    return (
+      <p className="state-msg" role="status">
+        Waking the server — on the free tier this can take up to a minute…
+      </p>
+    );
+  }
+
+  if (entity) {
+    const branch = entity.branch;
     return (
       <div>
         <div className="step-meta">
           <span>Step 2 of 2</span>
-          <span>Investor type</span>
+          <span>{entity.name}</span>
         </div>
         <div className="progress">
           <i style={{ width: "100%" }} />
         </div>
-        <h3 className="q">Who can invest in your fund?</h3>
-        <p className="q-sub">This sets the minimum net worth your FME needs.</p>
+        <h3 className="q">{branch.question}</h3>
+        <p className="q-sub">{branch.sub}</p>
+        {why && <p className="why">{why}</p>}
         <div className="opts">
-          <button className="opt" onClick={() => pickInvestor("nonretail")}>
-            <span className="ic"><Handshake size={20} style={{ strokeWidth: 2 }} /></span>
-            <span>
-              <span className="ot">Accredited / institutional only</span>
-              <span className="od">Non-retail — net worth from USD 500k</span>
-            </span>
-          </button>
-          <button className="opt" onClick={() => pickInvestor("retail")}>
-            <span className="ic"><Users size={20} style={{ strokeWidth: 2 }} /></span>
-            <span>
-              <span className="ot">Open to retail investors</span>
-              <span className="od">Retail — net worth USD 3M</span>
-            </span>
-          </button>
+          {branch.options.map((o) => (
+            <button key={o.id} className="opt" disabled={busy}
+              onClick={() => recommend(entity.key, o.id, why)}>
+              <span className="ic"><OptionIcon name={o.id} /></span>
+              <span>
+                <span className="ot">{o.label}</span>
+                <span className="od">{o.detail}</span>
+              </span>
+            </button>
+          ))}
         </div>
-        <button className="back" onClick={() => setStep(1)} style={{ display: "inline-flex", alignItems: "center", gap: "4px" }}>
+        {err && <div className="error-msg">{err}</div>}
+        <button className="back btn-icon" onClick={() => setEntity(null)}>
           <ArrowLeft size={14} /> Back
         </button>
       </div>
@@ -107,7 +127,7 @@ export default function Wizard({ onResult }) {
   return (
     <div>
       <div className="step-meta">
-        <span>Step 1 of 2</span>
+        <span>Step 1</span>
         <span>Choose your activity</span>
       </div>
       <div className="progress">
@@ -117,7 +137,7 @@ export default function Wizard({ onResult }) {
       <p className="q-sub">Pick the activity closest to your business.</p>
       <div className="opts">
         {options.map((o) => (
-          <button key={o.key} className="opt" onClick={() => pick(o.key)}>
+          <button key={o.key} className="opt" disabled={busy} onClick={() => pick(o.key)}>
             <span className="ic"><OptionIcon name={o.icon} /></span>
             <span>
               <span className="ot">{o.name}</span>
@@ -126,7 +146,8 @@ export default function Wizard({ onResult }) {
           </button>
         ))}
       </div>
-      <FreeTextIntake onClassified={pick} />
+      {err && <div className="error-msg">{err}</div>}
+      <FreeTextIntake onClassified={pick} disabled={busy} />
     </div>
   );
 }

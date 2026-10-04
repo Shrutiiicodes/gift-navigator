@@ -15,11 +15,22 @@ export default function EntityCard({ result }) {
               {result.eligibility.map((r, i) => (
                 <li key={i}>
                   {r.rule}
-                  {r.source && <span className="src">Source: {r.source}</span>}
+                  {r.source && (
+                    <span className="src">
+                      Source:{" "}
+                      {r.ref_url ? (
+                        <a href={r.ref_url} target="_blank" rel="noopener noreferrer">
+                          {r.source}
+                        </a>
+                      ) : (
+                        r.source
+                      )}
+                    </span>
+                  )}
                 </li>
               ))}
             </ul>
-            <h4 style={{ marginTop: "18px" }}>Indicative timeline</h4>
+            <h4 className="gap-top">Indicative timeline</h4>
             <div className="timeline-chip">{result.timeline_label}</div>
           </div>
           <div>
@@ -29,10 +40,16 @@ export default function EntityCard({ result }) {
                 <li key={i}>{a}</li>
               ))}
             </ul>
-            <h4 style={{ marginTop: "18px" }}>Regulator</h4>
+            <h4 className="gap-top">Regulator</h4>
             <div className="timeline-chip">{result.regulator}</div>
           </div>
         </div>
+        {result.last_reviewed && (
+          <p className="reviewed">
+            Indicative figures, last reviewed {result.last_reviewed}. Check the linked
+            sources for the current position.
+          </p>
+        )}
       </div>
     </div>
   );

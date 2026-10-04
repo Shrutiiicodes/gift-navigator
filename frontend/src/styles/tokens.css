@@ -894,7 +894,7 @@ footer a {
   font-family: var(--mono);
   font-size: 12px;
   color: var(--muted);
-  width: 96px;
+  width: 150px;
   flex: 0 0 auto;
 }
 
@@ -950,4 +950,85 @@ footer a {
   width: 56px;
   flex: 0 0 auto;
   text-align: right;
+}
+
+/* ---- Shared helpers ---- */
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.gap-top {
+  margin-top: 22px;
+}
+
+/* suffix variant of .inrow .pfx (e.g. a trailing "%") */
+.inrow .pfx.sfx {
+  border-right: none;
+  border-left: 1px solid var(--line);
+}
+
+.opt:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.opts + .error-msg {
+  margin-top: 14px;
+}
+
+/* "Why this structure" line shown when free-text routing picked the entity */
+.why {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+  margin: 0 0 14px;
+}
+
+.linklike {
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  color: var(--saffron-deep);
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.cert-grid li .src a {
+  color: inherit;
+  text-decoration: underline;
+}
+
+.cert-grid li .src a:hover {
+  color: #fff;
+}
+
+.reviewed {
+  font-family: var(--mono);
+  font-size: 11px;
+  color: #8da0b6;
+  margin: 18px 0 0;
+}
+
+.fb label {
+  font-family: var(--mono);
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.fb input {
+  flex: 1 1 220px;
+  min-width: 0;
+  font-family: var(--body);
+  font-size: 13px;
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+
+.fb input:focus-visible {
+  outline: 2px solid var(--saffron);
+  outline-offset: 1px;
 }

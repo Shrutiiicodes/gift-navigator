@@ -1,4 +1,19 @@
-const BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
+export const BASE = import.meta.env.VITE_API_URL || "http://localhost:8000";
+
+// Anonymous per-tab id so the usage funnel counts sessions, not clicks.
+// No personal data; gone when the tab closes.
+function sessionId() {
+  try {
+    let id = sessionStorage.getItem("gift_sid");
+    if (!id) {
+      id = crypto.randomUUID();
+      sessionStorage.setItem("gift_sid", id);
+    }
+    return id;
+  } catch (_) {
+    return null; // storage blocked - the backend counts the row on its own
+  }
+}
 
 async function call(path, options = {}) {
   const res = await fetch(`${BASE}${path}`, {
@@ -9,7 +24,7 @@ async function call(path, options = {}) {
     let detail = `Request failed (${res.status})`;
     try {
       const body = await res.json();
-      if (body.detail) detail = body.detail;
+      if (typeof body.detail === "string") detail = body.detail;
     } catch (_) {
       /* keep default */
     }
@@ -18,31 +33,20 @@ async function call(path, options = {}) {
   return res.json();
 }
 
+const post = (path, body) =>
+  call(path, { method: "POST", body: JSON.stringify(body) });
+
 export const api = {
   health: () => call("/health"),
   entities: () => call("/entities"),
   recommend: (entity_id, investor_type) =>
-    call("/recommend", {
-      method: "POST",
-      body: JSON.stringify({ entity_id, investor_type }),
-    }),
-  taxEstimate: (params) =>
-    call("/tax/estimate", {
-      method: "POST",
-      body: JSON.stringify(params),
-    }),
+    post("/recommend", { entity_id, investor_type, session_id: sessionId() }),
+  taxEstimate: (params) => post("/tax/estimate", params),
   taxRules: () => call("/tax/rules"),
-  classify: (text) =>
-    call("/classify", { method: "POST", body: JSON.stringify({ text }) }),
+  classify: (text) => post("/classify", { text, session_id: sessionId() }),
   feedback: (entity_id, helpful, comment) =>
-    call("/feedback", {
-      method: "POST",
-      body: JSON.stringify({ entity_id, helpful, comment }),
-    }),
+    post("/feedback", { entity_id, helpful, comment, session_id: sessionId() }),
   event: (kind, entity_id = null) =>
-    call("/event", {
-      method: "POST",
-      body: JSON.stringify({ kind, entity_id }),
-    }).catch(() => { }), // fire-and-forget; never block the UI
+    post("/event", { kind, entity_id, session_id: sessionId() }).catch(() => {}), // fire-and-forget; never block the UI
   analytics: () => call("/analytics"),
 };
