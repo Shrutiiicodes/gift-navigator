@@ -30,16 +30,16 @@
           "accessed": "2026-06-19"
         },
         {
-          "rule": "Two Key Managerial Personnel with relevant qualifications and track record",
+          "rule": "A principal officer and a separate compliance officer, both with relevant qualifications and experience",
           "source": "IFSCA (Fund Management) Regulations, 2025",
           "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=3",
-          "accessed": "2026-06-19"
+          "accessed": "2026-10-05"
         },
         {
-          "rule": "Minimum scheme corpus plus sponsor/manager skin-in-the-game contribution",
+          "rule": "Each scheme must reach its minimum corpus (USD 3,000,000 for venture capital and retail schemes)",
           "source": "IFSCA (Fund Management) Regulations, 2025",
           "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=3",
-          "accessed": "2026-06-19"
+          "accessed": "2026-10-05"
         },
         {
           "rule": "FATF-compliant, fit-and-proper, no adverse regulatory history",
@@ -160,10 +160,10 @@
           "accessed": "2026-06-19"
         },
         {
-          "rule": "Minimum owned funds (higher for fund-based activity)",
-          "source": "IFSCA (Finance Company) Regulations, 2021 — owned-fund thresholds",
-          "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=4",
-          "accessed": "2026-06-19"
+          "rule": "Minimum owned funds: USD 200,000 for operating leases, USD 3,000,000 for financial or hybrid leases",
+          "source": "IFSCA Framework for Aircraft Lease; IFSCA Framework for Ship Leasing",
+          "ref_url": "https://ifsca.gov.in/Document/Legal/framework-for-aircraft-lease16112023074417.pdf",
+          "accessed": "2026-10-05"
         },
         {
           "rule": "Defined permissible leasing activity (operating / financial lease)",
@@ -194,22 +194,23 @@
       "match_keywords": ["insurance", "insure", "reinsurance", "reinsurer", "insurer", "underwriting", "iio", "actuarial", "insurtech"],
       "eligibility": [
         {
-          "rule": "Be an insurer, reinsurer or intermediary (Indian or foreign)",
+          "rule": "Be an insurer or reinsurer (Indian or foreign) licensed in its home country. Intermediaries register under separate IFSCA rules",
           "source": "IFSCA (Registration of Insurance Business) Regulations, 2021",
-          "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=2",
-          "accessed": "2026-06-19"
+          "ref_url": "https://ifsca.gov.in/Document/Legal/consolidated-iio-regulations12112024104947.pdf",
+          "accessed": "2026-10-05"
         },
         {
-          "rule": "Satisfy IRDAI-aligned additional eligibility conditions",
-          "source": "IFSCA insurance framework (IRDAI-aligned)",
-          "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=2",
-          "accessed": "2026-06-19"
+          "rule": "No-objection certificate from the home-country regulator",
+          "source": "IFSCA (Registration of Insurance Business) Regulations, 2021",
+          "ref_url": "https://ifsca.gov.in/Document/Legal/consolidated-iio-regulations12112024104947.pdf",
+          "accessed": "2026-10-05"
         },
         {
-          "rule": "Minimum assigned capital per IFSCA insurance regulations",
+          "rule": "Minimum assigned capital for a branch office, held in the home country",
+          "value_usd": 1500000,
           "source": "IFSCA (Registration of Insurance Business) Regulations, 2021",
-          "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=2",
-          "accessed": "2026-06-19"
+          "ref_url": "https://ifsca.gov.in/Document/Legal/consolidated-iio-regulations12112024104947.pdf",
+          "accessed": "2026-10-05"
         },
         {
           "rule": "FATF-compliant promoters and fit-and-proper criteria",
@@ -235,27 +236,27 @@
       "eligibility": [
         {
           "rule": "Apply under the IFSCA Fintech framework (authorisation or sandbox)",
-          "source": "IFSCA (FinTech Entity) Framework, 2022",
-          "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=6",
-          "accessed": "2026-06-19"
+          "source": "IFSCA Framework for FinTech Entity in the IFSCs, 2022",
+          "ref_url": "https://ifsca.gov.in/Document/Legal/fe-framework_27-04-202227042022122844.pdf",
+          "accessed": "2026-10-05"
         },
         {
           "rule": "Demonstrate a genuine fintech innovation or use case",
-          "source": "IFSCA (FinTech Entity) Framework, 2022",
-          "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=6",
-          "accessed": "2026-06-19"
+          "source": "IFSCA Framework for FinTech Entity in the IFSCs, 2022",
+          "ref_url": "https://ifsca.gov.in/Document/Legal/fe-framework_27-04-202227042022122844.pdf",
+          "accessed": "2026-10-05"
         },
         {
-          "rule": "Lower entry barriers vs full licences (sandbox route)",
-          "source": "IFSCA regulatory sandbox provisions",
-          "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=6",
-          "accessed": "2026-06-19"
+          "rule": "Sandbox route: a Limited Use Authorisation to test the product for up to 12 months",
+          "source": "IFSCA Framework for FinTech Entity in the IFSCs, 2022",
+          "ref_url": "https://ifsca.gov.in/Document/Legal/fe-framework_27-04-202227042022122844.pdf",
+          "accessed": "2026-10-05"
         },
         {
-          "rule": "Eligible for incentive / grant support",
-          "source": "IFSCA FinTech Incentive Scheme",
-          "ref_url": "https://www.ifsca.gov.in",
-          "accessed": "2026-06-19"
+          "rule": "Sandbox entrants can apply for grants under the incentive scheme",
+          "source": "IFSCA (FinTech Incentive) Scheme, 2022",
+          "ref_url": "https://ifsca.gov.in/Document/Legal/guidelines-of-ifsca-fintech-incentive-scheme_202212092022060813.pdf",
+          "accessed": "2026-10-05"
         }
       ],
       "timeline_weeks": [4, 8],
@@ -280,14 +281,14 @@
           "accessed": "2026-06-19"
         },
         {
-          "rule": "Meet prescribed net-worth thresholds",
+          "rule": "Net worth held in liquid assets: as set by the exchange for trading members, USD 100,000 for global-access-only broker-dealers",
           "source": "IFSCA (Capital Market Intermediaries) Regulations, 2025",
           "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=7",
-          "accessed": "2026-06-19"
+          "accessed": "2026-10-05"
         },
         {
-          "rule": "Membership of a recognised IFSC stock exchange",
-          "source": "IFSCA capital markets framework",
+          "rule": "Membership of a recognised IFSC stock exchange (to trade as a trading member)",
+          "source": "IFSCA (Capital Market Intermediaries) Regulations, 2025",
           "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=7",
           "accessed": "2026-06-19"
         },

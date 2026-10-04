@@ -4,7 +4,7 @@ export default function EntityCard({ result }) {
       <p className="label">Recommended structure</p>
       <h2>{result.name}</h2>
       <p className="rec-meta">
-        {result.tag} · Regulated by {result.regulator} · Typical setup time{" "}
+        {result.tag} · Regulated by {result.regulator} · Setup time (rough estimate){" "}
         {result.timeline_label}
       </p>
       <p className="rec-what">{result.what}</p>
