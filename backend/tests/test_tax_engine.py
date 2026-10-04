@@ -12,17 +12,17 @@ def test_basic_saving():
     assert out["annual_saving"] == 500_000
 
 
-def test_holiday_total_is_ten_years():
+def test_holiday_total_covers_the_holiday_years():
     out = tax_engine.estimate(1_000_000, 30)
-    assert out["holiday_years"] == 10
-    assert out["holiday_total_saving"] == out["annual_saving"] * 10
+    assert out["holiday_years"] == 20
+    assert out["holiday_total_saving"] == out["annual_saving"] * 20
 
 
 def test_block_saving_includes_concessional_tail():
     out = tax_engine.estimate(1_000_000, 30)
-    # block = 25y: 10y holiday (full saving) + 15y at (30% - 15%) delta
-    holiday = 300_000 * 10
-    tail = (300_000 - 150_000) * 15  # onshore 30% vs ifsc 15% on 1M, 15 years
+    # block = 25y: 20y holiday (full saving) + 5y at (30% - 15%) delta
+    holiday = 300_000 * 20
+    tail = (300_000 - 150_000) * 5  # onshore 30% vs ifsc 15% on 1M, 5 years
     assert out["block_total_saving"] == holiday + tail
 
 
@@ -56,10 +56,10 @@ def test_disclaimer_present():
 # ---- Extension tests: adjustable block, cumulative series, advanced mode ----
 
 def test_series_length_matches_block():
-    out = tax_engine.estimate(1_000_000, 25, block_period_years=18)
-    assert out["block_period_years"] == 18
-    assert len(out["series"]) == 18
-    assert out["series"][-1]["year"] == 18
+    out = tax_engine.estimate(1_000_000, 25, block_period_years=22)
+    assert out["block_period_years"] == 22
+    assert len(out["series"]) == 22
+    assert out["series"][-1]["year"] == 22
 
 
 def test_series_is_cumulative_and_monotonic():
@@ -71,13 +71,15 @@ def test_series_is_cumulative_and_monotonic():
 
 def test_series_phase_switches_after_holiday():
     out = tax_engine.estimate(1_000_000, 25)
-    assert out["series"][9]["phase"] == "holiday"        # year 10
-    assert out["series"][10]["phase"] == "concessional"  # year 11
+    assert out["series"][19]["phase"] == "holiday"       # year 20
+    assert out["series"][20]["phase"] == "concessional"  # year 21
 
 
 def test_block_period_out_of_bounds_rejected():
     with pytest.raises(ValueError):
         tax_engine.estimate(1_000_000, 25, block_period_years=40)
+    with pytest.raises(ValueError):  # shorter than the holiday itself
+        tax_engine.estimate(1_000_000, 25, block_period_years=15)
 
 
 def test_advanced_surcharge_cess_increases_onshore_tax():

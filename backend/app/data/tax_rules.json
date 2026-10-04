@@ -2,18 +2,18 @@
   "_meta": {
     "description": "Tax parameters for the GIFT IFSC saving estimator. All values INDICATIVE and must be verified against the latest Finance Act and IFSCA circulars.",
     "schema_version": "1.0.0",
-    "last_reviewed": "2026-06-19"
+    "last_reviewed": "2026-10-05"
   },
   "section_80la": {
-    "label": "Section 80LA deduction",
+    "label": "IFSC unit deduction (section 147, formerly section 80LA)",
     "deduction_pct": 100,
-    "holiday_years": 10,
+    "holiday_years": 20,
     "block_period_years": 25,
     "post_holiday_rate_pct": 15,
-    "notes": "100% deduction on eligible income for any 10 consecutive years chosen within a block period. Budget 2026 indicated the block window can extend up to 25 years. A concessional rate (~15%) is referenced for income outside the holiday. VERIFY against the latest Finance Act.",
-    "source": "Income-tax Act, 1961 — Section 80LA; Finance Act (verify current year)",
-    "ref_url": "https://incometaxindia.gov.in",
-    "accessed": "2026-06-19"
+    "notes": "100% deduction on eligible income for any 20 consecutive years out of a 25-year block (10 out of 15 before 1 April 2026). Business income outside the deduction period is taxed at 15% plus surcharge and cess. Changed by the Finance Act, 2026 (notified 30 March 2026), effective tax year 2026-27.",
+    "source": "Income-tax Act, 2025 — section 147 (formerly section 80LA of the 1961 Act), as amended by the Finance Act, 2026",
+    "ref_url": "https://www.indiabudget.gov.in/doc/memo.pdf",
+    "accessed": "2026-10-05"
   },
   "onshore_default_rate_pct": 25,
   "onshore_rate_bounds_pct": {
@@ -21,22 +21,22 @@
     "max": 35
   },
   "block_period_bounds_years": {
-    "min": 10,
+    "min": 20,
     "max": 25
   },
   "advanced_defaults": {
     "surcharge_pct": 12,
     "cess_pct": 4,
     "mat_rate_pct": 9,
-    "_note": "Surcharge applies on tax; cess applies on tax+surcharge. MAT (minimum alternate tax) on book profits can apply during the holiday even with the 100% deduction, so 'apply_mat' lifts IFSC holiday tax from zero to the MAT charge. All values INDICATIVE — verify against the latest Finance Act.",
-    "source": "Income-tax Act, 1961 — MAT (s.115JB) and surcharge/cess schedules; verify current rates",
-    "ref_url": "https://incometaxindia.gov.in",
-    "accessed": "2026-06-19"
+    "_note": "Surcharge applies on tax; cess applies on tax+surcharge. MAT (minimum alternate tax) on book profits can apply during the holiday even with the 100% deduction, so 'apply_mat' lifts IFSC holiday tax from zero to the MAT charge. 9% is the concessional MAT rate for IFSC units earning solely in convertible foreign exchange (the general rate fell to 14% in the Finance Act, 2026). 12% is the surcharge for a domestic company with income above Rs 10 crore (7% between Rs 1 crore and Rs 10 crore). All values INDICATIVE.",
+    "source": "Income Tax Department — MAT for IFSC units (s.115JB of the 1961 Act) and company surcharge/cess rates",
+    "ref_url": "https://www.incometaxindia.gov.in/w/%E2%80%8Bminimum-alternate-tax-and-alternate-minimum-tax%E2%80%8B",
+    "accessed": "2026-10-05"
   },
   "comparison_hubs": [
     {
       "factor": "Headline tax on eligible income",
-      "gift": "0% (10-yr holiday), then ~15%",
+      "gift": "0% (20-yr holiday), then 15%",
       "dubai": "9% (with relief band)",
       "singapore": "17% (incentives can lower)"
     },

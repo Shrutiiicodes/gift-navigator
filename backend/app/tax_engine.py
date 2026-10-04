@@ -1,7 +1,8 @@
 """Tax engine: estimates saving from the GIFT IFSC tax holiday vs staying onshore.
 
 Two modes:
-  * Simple (default): full Section 80LA deduction during the holiday, concessional rate
+  * Simple (default): full IFSC deduction (section 147 of the Income-tax Act, 2025;
+    formerly section 80LA) during the holiday, concessional rate
     on the tail of the block. Surcharge/cess/MAT all off, so it reduces to the original
     first-order model and stays backward compatible.
   * Advanced: layers surcharge and cess onto every tax figure, and optionally applies
@@ -20,11 +21,11 @@ from typing import Any, Optional
 DATA_DIR = Path(__file__).parent / "data"
 
 DISCLAIMER = (
-    "Indicative model only. Simple mode assumes eligible income qualifies for the "
-    "Section 80LA 100% deduction during a 10-year window of the block period, with a "
-    "concessional rate thereafter. Advanced mode adds surcharge, cess and (optionally) "
-    "minimum alternate tax, but still ignores GST and entity-specific rules. "
-    "Not legal or tax advice."
+    "Indicative model only. It assumes all of the income entered qualifies for the 100% "
+    "IFSC deduction (section 147 of the Income-tax Act, 2025, formerly section 80LA) for "
+    "the holiday years of the block period, with the concessional rate after that. "
+    "Including surcharge, cess and minimum alternate tax narrows the gap, but the model "
+    "still ignores GST and entity-specific rules. Not legal or tax advice."
 )
 
 

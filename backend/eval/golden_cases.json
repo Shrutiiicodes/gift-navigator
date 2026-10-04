@@ -1,6 +1,6 @@
 {
   "_meta": {
-    "description": "Expert-validated scenarios for evaluating the free-text classifier. 'text' is a realistic business description; 'expected' is the entity a domain reading of the rules assigns; 'difficulty' is 'easy' (keyword-obvious) or 'hard' (synonyms, indirect phrasing, or mixed signals that stress the matcher and exercise the fallback path).",
+    "description": "Hand-labelled scenarios for evaluating the free-text classifier. 'text' is a realistic business description; 'expected' is the entity a domain reading of the rules assigns; 'difficulty' is 'easy' (keyword-obvious) or 'hard' (synonyms, indirect phrasing, or mixed signals that stress the matcher and exercise the fallback path).",
     "version": "2.0.0"
   },
   "cases": [

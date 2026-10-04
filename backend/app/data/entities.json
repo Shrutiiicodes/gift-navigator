@@ -2,7 +2,7 @@
   "_meta": {
     "description": "Single source of truth for GIFT IFSC entity structures. Every threshold carries a source so output is auditable. Figures are INDICATIVE and must be verified against current IFSCA circulars before any real use.",
     "schema_version": "1.0.0",
-    "last_reviewed": "2026-06-19",
+    "last_reviewed": "2026-10-05",
     "disclaimer": "Not legal or tax advice. Verify against current IFSCA circulars and the latest Finance Act."
   },
   "entities": [
@@ -17,27 +17,27 @@
       "eligibility": [
         {
           "rule": "Register as a Fund Management Entity (FME) with IFSCA",
-          "source": "IFSCA (Fund Management) Regulations, 2022",
+          "source": "IFSCA (Fund Management) Regulations, 2025",
           "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=3",
           "accessed": "2026-06-19"
         },
         {
           "rule": "Minimum net worth",
           "value_nonretail_usd": 500000,
-          "value_retail_usd": 3000000,
-          "source": "IFSCA (Fund Management) Regulations, 2022 — net worth requirements by FME category",
+          "value_retail_usd": 1000000,
+          "source": "IFSCA (Fund Management) Regulations, 2025 — net worth requirements by FME category",
           "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=3",
           "accessed": "2026-06-19"
         },
         {
           "rule": "Two Key Managerial Personnel with relevant qualifications and track record",
-          "source": "IFSCA (Fund Management) Regulations, 2022",
+          "source": "IFSCA (Fund Management) Regulations, 2025",
           "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=3",
           "accessed": "2026-06-19"
         },
         {
           "rule": "Minimum scheme corpus plus sponsor/manager skin-in-the-game contribution",
-          "source": "IFSCA (Fund Management) Regulations, 2022",
+          "source": "IFSCA (Fund Management) Regulations, 2025",
           "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=3",
           "accessed": "2026-06-19"
         },
@@ -58,7 +58,7 @@
           "sub": "This sets the minimum net worth your FME needs.",
           "options": [
             {"id": "nonretail", "label": "Accredited / institutional only", "detail": "Non-retail — net worth from USD 500k"},
-            {"id": "retail", "label": "Open to retail investors", "detail": "Retail — net worth USD 3M"}
+            {"id": "retail", "label": "Open to retail investors", "detail": "Retail — net worth USD 1M"}
           ]
         }
       }
@@ -275,13 +275,13 @@
       "eligibility": [
         {
           "rule": "Register with IFSCA as a broker-dealer / intermediary",
-          "source": "IFSCA (Capital Market Intermediaries) Regulations, 2021",
+          "source": "IFSCA (Capital Market Intermediaries) Regulations, 2025",
           "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=7",
           "accessed": "2026-06-19"
         },
         {
           "rule": "Meet prescribed net-worth thresholds",
-          "source": "IFSCA (Capital Market Intermediaries) Regulations, 2021",
+          "source": "IFSCA (Capital Market Intermediaries) Regulations, 2025",
           "ref_url": "https://www.ifsca.gov.in/Legal/IndexLegal?cid=7",
           "accessed": "2026-06-19"
         },

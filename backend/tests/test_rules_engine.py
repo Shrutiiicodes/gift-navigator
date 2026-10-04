@@ -29,7 +29,7 @@ def test_aif_nonretail_net_worth():
 def test_aif_retail_net_worth():
     out = rules_engine.recommend("aif", investor_type="retail")
     nw = [r for r in out["eligibility"] if "net worth" in r["rule"].lower()][0]
-    assert "3,000,000" in nw["rule"]
+    assert "1,000,000" in nw["rule"]
     assert "retail" in nw["rule"]
 
 

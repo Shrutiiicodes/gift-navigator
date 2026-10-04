@@ -138,6 +138,10 @@ The live demo is split across two free hosts:
 
 ---
 
+## Author
+
+Built by [Shrutiiicodes](https://github.com/Shrutiiicodes).
+
 ## License
 
 Educational prototype. Not affiliated with IFSCA or any government body. Figures are illustrative and must not be relied upon for actual structuring or tax decisions.

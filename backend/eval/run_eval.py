@@ -1,6 +1,6 @@
 """Evaluation harness for the free-text classifier.
 
-Runs the expert-validated golden set through the classifier and reports:
+Runs the hand-labelled golden set through the classifier and reports:
   * overall accuracy
   * accuracy broken down by resolution PATH (keyword / fallback / llm) - so the
     cheap deterministic path and the escalation path are measured separately

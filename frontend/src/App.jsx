@@ -111,7 +111,9 @@ export default function App() {
           A prototype for learning purposes. Figures are indicative and are not legal or
           tax advice. Check them against current{" "}
           <a href="https://www.ifsca.gov.in" target="_blank" rel="noopener noreferrer">IFSCA</a>{" "}
-          circulars before relying on anything here.
+          circulars before relying on anything here. Built by{" "}
+          <a href="https://github.com/Shrutiiicodes" target="_blank" rel="noopener noreferrer">Shrutiiicodes</a>
+          {" "}(<a href="https://github.com/Shrutiiicodes/gift-navigator" target="_blank" rel="noopener noreferrer">source</a>).
         </div>
       </footer>
     </>

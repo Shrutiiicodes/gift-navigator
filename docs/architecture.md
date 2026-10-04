@@ -20,7 +20,7 @@ The single source of truth.
   keyword list for the classifier, and any decision branches (e.g. AIF retail vs
   non-retail net worth).
 - `tax_rules.json` — holiday length, block period, post-holiday concessional rate,
-  Section 80LA reference, onshore-rate bounds, and the hub-comparison data.
+  section 147 (formerly 80LA) reference, onshore-rate bounds, and the hub-comparison data.
 
 Updating a threshold is a one-file edit with a citation — no code change.
 
@@ -80,12 +80,12 @@ for pulling the raw rows off the host.
 
 ## Tax model: simple vs advanced
 
-`tax_engine.estimate` runs in two modes. In **simple** mode it applies the full Section
-80LA deduction during the holiday (IFSC tax = 0) and a concessional rate on the remainder
+`tax_engine.estimate` runs in two modes. In **simple** mode it applies the full section
+147 (formerly 80LA) deduction during the holiday (IFSC tax = 0) and a concessional rate on the remainder
 of the block. In **advanced** mode it layers surcharge and cess onto every tax figure
 (surcharge on tax, cess on tax+surcharge) and optionally applies minimum alternate tax
 (MAT) as a floor during the holiday and afterwards. The block period is an adjustable
-input (bounded 10–25 years), and the engine returns a year-by-year cumulative series that
+input (bounded 20–25 years, since the holiday itself is 20), and the engine returns a year-by-year cumulative series that
 drives the savings chart on the frontend. Simple mode zeroes all advanced knobs, so it
 reduces exactly to the original first-order model and the original tests still hold.
 
@@ -105,7 +105,7 @@ demand (which structures) and friction (where users abandon).
    the advanced tax mode (surcharge/cess compounding, MAT floor, adjustable-block bounds,
    cumulative-series monotonicity), the classifier's escalation rules, and the API
    (validation, session-based funnel, export guard, DB migration). 43 tests, run in CI.
-2. **Golden-set validation** — `eval/golden_cases.json` (53 cases, tagged easy/hard) +
+2. **Golden-set validation** — `eval/golden_cases.json` (53 hand-labelled cases, tagged easy/hard) +
    `eval/run_eval.py` produce overall accuracy, accuracy broken down by **resolution path**
    (keyword vs fallback vs LLM) and by **difficulty**, plus a confusion matrix and the
    escalation rate. The keyword path and the escalation path are measured separately so
